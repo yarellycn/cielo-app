@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
 import 'package:flutter/material.dart';
@@ -80,9 +81,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                           context,
                         ).textTheme.labelSmall?.copyWith(color: Colors.white),
                       ),
-                      Text('Montpellier', style: Theme.of(
+                      Text(
+                        'Montpellier',
+                        style: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.copyWith(color: Colors.white)),
+                        ).textTheme.labelSmall?.copyWith(color: Colors.white),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -91,7 +95,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                           Column(
                             children: [
                               Text('${snapshot.data!['temperature_2m']} °C'),
-                              Text('${snapshot.data!['weather_code']}'),
+                              Text(
+                                WeatherCode.fromCode(
+                                      snapshot.data!['weather_code'] as int,
+                                    )?.description ??
+                                    'Unknown weather',
+                              ),
                             ],
                           ),
                         ],
