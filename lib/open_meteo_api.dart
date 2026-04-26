@@ -17,7 +17,7 @@ class OpenMeteoApi {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
       'current':
-          'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover',
+          'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
     };
 
     /// Build the URI for the API request
