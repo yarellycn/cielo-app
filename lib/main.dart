@@ -30,7 +30,13 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CieloAppBar(),
-      body: const Center(child: CurrentWeatherCard()),
+      body: ListView(
+        padding: const EdgeInsets.all(30),
+        children: const [
+          Center(child: CurrentWeatherCard()),
+          Center(child: CurrentWeatherCard()),
+        ],
+      ),
     );
   }
 }

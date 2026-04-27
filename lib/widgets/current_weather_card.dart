@@ -36,15 +36,15 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         textAlign: TextAlign.center,
       );
     } else if (snapshot.hasData) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final cardWidth = screenWidth * 0.85;
+      // final screenWidth = MediaQuery.of(context).size.width;
+      // final cardWidth = screenWidth * 0.85;
       const cardPadding = 35.0;
       const tileWidth = 130.0;
       const tileHeight = 60.0;
       const tileSpacing = 12.0;
 
       weatherWidget = Container(
-        width: cardWidth,
+        // width: cardWidth,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 60, 123, 175),
           borderRadius: BorderRadius.circular(12),
