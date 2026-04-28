@@ -3,6 +3,7 @@ import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// A widget that displays the current weather data fetched from the Open-Meteo API.
 class CurrentWeatherCard extends StatefulWidget {
@@ -41,6 +42,10 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       );
     } else if (snapshot.hasData) {
       final weather = snapshot.data!.currentWeatherData;
+      final formattedDate = DateFormat(
+        'EEEE d MMMM y HH:mm',
+        'fr_FR',
+      ).format(weather.time);
       const cardPadding = 35.0;
       const tileWidth = 130.0;
       const tileHeight = 60.0;
@@ -79,6 +84,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     children: [
                       Text(
                         'Météo Actuelle'.toUpperCase(),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
                         style: Theme.of(
                           context,
                         ).textTheme.labelSmall?.copyWith(color: Colors.white),

@@ -1,8 +1,11 @@
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('fr_FR');
   runApp(const MyApp());
 }
 
@@ -34,7 +37,7 @@ class MyHomePage extends StatelessWidget {
         padding: const EdgeInsets.all(30),
         children: const [
           Center(child: CurrentWeatherCard()),
-          Center(child: CurrentWeatherCard()),
+          // Center(child: CurrentWeatherCard()),
         ],
       ),
     );
