@@ -25,16 +25,18 @@ class DailyWeather {
 
   factory DailyWeather.fromJson(Map<String, dynamic> json) {
     return DailyWeather(
-      date: (json['time']) as DateTime,
+      date: DateTime.parse(json['time'] as String),
       minTemperature: (json['temperature_2m_min'] as num).toDouble(),
-      maxTemperature:(json['temperature_2m_max'] as num).toDouble(),
-      minApparentTemperature: (json['apparent_temperature_min'] as num).toDouble(),
-      maxApparentTemperature: (json['apparent_temperature_max'] as num).toDouble(),
-      meanRelativeHumidity: (json['relative_humidity_2m_mean']) as int,
+      maxTemperature: (json['temperature_2m_max'] as num).toDouble(),
+      minApparentTemperature: (json['apparent_temperature_min'] as num)
+          .toDouble(),
+      maxApparentTemperature: (json['apparent_temperature_max'] as num)
+          .toDouble(),
+      meanRelativeHumidity: (json['relative_humidity_2m_mean'] as num).toInt(),
       maxWindSpeed: (json['wind_speed_10m_max'] as num).toDouble(),
       precipitationSum: (json['precipitation_sum'] as num).toDouble(),
-      meanCloudCover: (json['cloud_cover_mean']) as int,
-      weatherCode: (json['weather_code']) as int,
+      meanCloudCover: (json['cloud_cover_mean'] as num).toInt(),
+      weatherCode: (json['weather_code'] as num).toInt(),
     );
   }
 }

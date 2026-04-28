@@ -1,4 +1,4 @@
-import 'package:cielo_app/models/current_weather.dart';
+import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
@@ -16,7 +16,7 @@ class CurrentWeatherCard extends StatefulWidget {
 
 /// State for [CurrentWeatherCard].
 class CurrentWeatherCardState extends State<CurrentWeatherCard> {
-  late final Future<CurrentWeather> forecastDataFuture;
+  late final Future<ForecastData> forecastDataFuture;
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
   /// Builds the card contents for the current [forecastDataFuture] snapshot.
   Widget buildWeatherWidget(
     BuildContext context,
-    AsyncSnapshot<CurrentWeather> snapshot,
+    AsyncSnapshot<ForecastData> snapshot,
   ) {
     final Widget weatherWidget;
 
@@ -40,16 +40,13 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         textAlign: TextAlign.center,
       );
     } else if (snapshot.hasData) {
-      // final screenWidth = MediaQuery.of(context).size.width;
-      // final cardWidth = screenWidth * 0.85;
-      final weather = snapshot.data!;
+      final weather = snapshot.data!.currentWeatherData;
       const cardPadding = 35.0;
       const tileWidth = 130.0;
       const tileHeight = 60.0;
       const tileSpacing = 12.0;
 
       weatherWidget = Container(
-        // width: cardWidth,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 60, 123, 175),
           borderRadius: BorderRadius.circular(12),
@@ -175,7 +172,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       ),
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
-        child: FutureBuilder<CurrentWeather>(
+        child: FutureBuilder<ForecastData>(
           future: forecastDataFuture,
           builder: buildWeatherWidget,
         ),
