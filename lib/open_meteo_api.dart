@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:cielo_app/models/current_weather.dart';
 import 'package:http/http.dart' as http;
 
 /// Open-Meteo API wrapper
@@ -9,7 +10,7 @@ class OpenMeteoApi {
   static const String url = 'api.open-meteo.com';
 
   /// Fetches the current weather data for the specified latitude and longitude.
-  Future<Map> fetchForecastData({
+  Future<CurrentWeather> fetchForecastData({
     double latitude = defaultLatitude,
     double longitude = defaultLongitude,
   }) async {
@@ -18,6 +19,12 @@ class OpenMeteoApi {
       'longitude': longitude.toString(),
       'current':
           'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
+      // 'hourly':
+      //     'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
+      // 'daily':
+      //     'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
+      // 'past_days': 3,
+      // 'forecast_days': 3,
     };
 
     /// Build the URI for the API request
@@ -32,13 +39,13 @@ class OpenMeteoApi {
     }
 
     /// Parse the JSON response
-    final Map<String, dynamic>? json = jsonDecode(response.body);
-    final Map<String, dynamic>? current = json?['current'];
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final current = json['current'] as Map<String, dynamic>?;
     log('Current weather data: $current');
 
     if (current == null) {
-      throw Exception('Temperature not found in Open-Meteo response');
+      throw Exception('Current weather not found in Open-Meteo response');
     }
-    return current;
+    return CurrentWeather.fromJson(current);
   }
 }

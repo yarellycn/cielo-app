@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
@@ -15,7 +16,7 @@ class CurrentWeatherCard extends StatefulWidget {
 
 /// State for [CurrentWeatherCard].
 class CurrentWeatherCardState extends State<CurrentWeatherCard> {
-  late final Future<Map> forecastDataFuture;
+  late final Future<CurrentWeather> forecastDataFuture;
 
   @override
   void initState() {
@@ -24,7 +25,10 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
   }
 
   /// Builds the card contents for the current [forecastDataFuture] snapshot.
-  Widget buildWeatherWidget(BuildContext context, AsyncSnapshot<Map> snapshot) {
+  Widget buildWeatherWidget(
+    BuildContext context,
+    AsyncSnapshot<CurrentWeather> snapshot,
+  ) {
     final Widget weatherWidget;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -38,6 +42,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     } else if (snapshot.hasData) {
       // final screenWidth = MediaQuery.of(context).size.width;
       // final cardWidth = screenWidth * 0.85;
+      final weather = snapshot.data!;
       const cardPadding = 35.0;
       const tileWidth = 130.0;
       const tileHeight = 60.0;
@@ -94,10 +99,10 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                           const SizedBox(width: 8),
                           Column(
                             children: [
-                              Text('${snapshot.data!['temperature_2m']} °C'),
+                              Text('${weather.temperature} °C'),
                               Text(
                                 WeatherCode.fromCode(
-                                      snapshot.data!['weather_code'] as int,
+                                      weather.weatherCode,
                                     )?.description ??
                                     'Unknown weather',
                               ),
@@ -124,25 +129,23 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     children: [
                       WeatherInfoTile(
                         title: 'Ressenti'.toUpperCase(),
-                        information:
-                            '${snapshot.data!['apparent_temperature']} °C',
+                        information: '${weather.apparentTemperature} °C',
                       ),
                       WeatherInfoTile(
                         title: 'Humidité'.toUpperCase(),
-                        information:
-                            '${snapshot.data!['relative_humidity_2m']} %',
+                        information: '${weather.relativeHumidity} %',
                       ),
                       WeatherInfoTile(
                         title: 'Vent'.toUpperCase(),
-                        information: '${snapshot.data!['wind_speed_10m']} km/h',
+                        information: '${weather.windSpeed} km/h',
                       ),
                       WeatherInfoTile(
                         title: 'Précipitations'.toUpperCase(),
-                        information: '${snapshot.data!['precipitation']} mm',
+                        information: '${weather.precipitation} mm',
                       ),
                       WeatherInfoTile(
                         title: 'Nuages'.toUpperCase(),
-                        information: '${snapshot.data!['cloud_cover']} %',
+                        information: '${weather.cloudCover} %',
                       ),
                     ],
                   ),
@@ -172,7 +175,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       ),
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
-        child: FutureBuilder<Map>(
+        child: FutureBuilder<CurrentWeather>(
           future: forecastDataFuture,
           builder: buildWeatherWidget,
         ),

@@ -21,14 +21,14 @@ class CurrentWeather {
 
   factory CurrentWeather.fromJson(Map<String, dynamic> json) {
     return CurrentWeather(
-      time: (json['time']) as DateTime,
+      time: DateTime.parse(json['time'] as String),
       temperature: (json['temperature_2m'] as num).toDouble(),
       apparentTemperature: (json['apparent_temperature'] as num).toDouble(),
-      relativeHumidity: (json['relative_humidity_2m']) as int,
+      relativeHumidity: (json['relative_humidity_2m'] as num).toInt(),
       windSpeed: (json['wind_speed_10m'] as num).toDouble(),
       precipitation: (json['precipitation'] as num).toDouble(),
-      cloudCover: (json['cloud_cover']) as int,
-      weatherCode: (json['weather_code']) as int,
+      cloudCover: (json['cloud_cover'] as num).toInt(),
+      weatherCode: (json['weather_code'] as num).toInt(),
     );
   }
 }
