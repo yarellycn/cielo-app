@@ -1,5 +1,6 @@
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
+import 'package:cielo_app/widgets/daily_forecast_list.dart';
 import 'package:cielo_app/widgets/forecast_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -39,6 +40,7 @@ class MyHomePage extends StatelessWidget {
         children: const [
           Center(child: CurrentWeatherCard()),
           Center(child: ForecastRangeSelector()),
+          DailyForecastList(),
         ],
       ),
     );
