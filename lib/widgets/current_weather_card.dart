@@ -26,32 +26,32 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
   }
 
   /// Builds the card contents for the current [forecastDataFuture] snapshot.
-  Widget buildWeatherWidget(
+  Widget buildCurrentWeatherWidget(
     BuildContext context,
     AsyncSnapshot<ForecastData> snapshot,
   ) {
-    final Widget weatherWidget;
+    final Widget currentWeatherWidget;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
-      weatherWidget = const CircularProgressIndicator();
+      currentWeatherWidget = const CircularProgressIndicator();
     } else if (snapshot.hasError) {
-      weatherWidget = Text(
+      currentWeatherWidget = Text(
         'Unable to load weather data: ${snapshot.error}',
         style: Theme.of(context).textTheme.headlineSmall,
         textAlign: TextAlign.center,
       );
     } else if (snapshot.hasData) {
-      final weather = snapshot.data!.currentWeatherData;
+      final currentWeather = snapshot.data!.currentWeatherData;
       final formattedDate = DateFormat(
         'EEEE d MMMM y HH:mm',
         'fr_FR',
-      ).format(weather.time);
+      ).format(currentWeather.time);
       const cardPadding = 35.0;
       const tileWidth = 130.0;
       const tileHeight = 60.0;
       const tileSpacing = 12.0;
 
-      weatherWidget = Container(
+      currentWeatherWidget = Container(
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 60, 123, 175),
           borderRadius: BorderRadius.circular(12),
@@ -107,12 +107,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                           const SizedBox(width: 8),
                           Column(
                             children: [
-                              Text('${weather.temperature} °C'),
+                              Text('${currentWeather.temperature} °C'),
                               Text(
                                 WeatherCode.fromCode(
-                                      weather.weatherCode,
+                                      currentWeather.weatherCode,
                                     )?.description ??
-                                    'Unknown weather',
+                                    'Unknown currentWeather',
                               ),
                             ],
                           ),
@@ -137,23 +137,23 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     children: [
                       WeatherInfoTile(
                         title: 'Ressenti'.toUpperCase(),
-                        information: '${weather.apparentTemperature} °C',
+                        information: '${currentWeather.apparentTemperature} °C',
                       ),
                       WeatherInfoTile(
                         title: 'Humidité'.toUpperCase(),
-                        information: '${weather.relativeHumidity} %',
+                        information: '${currentWeather.relativeHumidity} %',
                       ),
                       WeatherInfoTile(
                         title: 'Vent'.toUpperCase(),
-                        information: '${weather.windSpeed} km/h',
+                        information: '${currentWeather.windSpeed} km/h',
                       ),
                       WeatherInfoTile(
                         title: 'Précipitations'.toUpperCase(),
-                        information: '${weather.precipitation} mm',
+                        information: '${currentWeather.precipitation} mm',
                       ),
                       WeatherInfoTile(
                         title: 'Nuages'.toUpperCase(),
-                        information: '${weather.cloudCover} %',
+                        information: '${currentWeather.cloudCover} %',
                       ),
                     ],
                   ),
@@ -164,10 +164,10 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         ),
       );
     } else {
-      weatherWidget = const Text('No data available');
+      currentWeatherWidget = const Text('No data available');
     }
 
-    return weatherWidget;
+    return currentWeatherWidget;
   }
 
   @override
@@ -185,7 +185,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         style: const TextStyle(color: Colors.white),
         child: FutureBuilder<ForecastData>(
           future: forecastDataFuture,
-          builder: buildWeatherWidget,
+          builder: buildCurrentWeatherWidget,
         ),
       ),
     );
