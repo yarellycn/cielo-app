@@ -31,6 +31,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     AsyncSnapshot<ForecastData> snapshot,
   ) {
     final Widget currentWeatherWidget;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
       currentWeatherWidget = const CircularProgressIndicator();
@@ -53,7 +54,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
 
       currentWeatherWidget = Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 60, 123, 175),
+          color: colorScheme.primary,
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(cardPadding),
@@ -82,28 +83,15 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     crossAxisAlignment: .start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Météo Actuelle'.toUpperCase(),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelSmall?.copyWith(color: Colors.white),
-                      ),
+                      Text('Météo Actuelle'.toUpperCase()),
                       Text(
                         '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelSmall?.copyWith(color: Colors.white),
                       ),
-                      Text(
-                        'Montpellier',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.labelSmall?.copyWith(color: Colors.white),
-                      ),
+                      Text('Montpellier'),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Icon(Icons.wb_sunny),
+                          Icon(Icons.wb_sunny, color: colorScheme.onPrimary),
                           const SizedBox(width: 8),
                           Column(
                             children: [
@@ -182,7 +170,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         ),
       ),
       child: DefaultTextStyle.merge(
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         child: FutureBuilder<ForecastData>(
           future: forecastDataFuture,
           builder: buildCurrentWeatherWidget,
