@@ -1,9 +1,9 @@
 class CurrentWeather {
   final DateTime time;
-  final double temperature;
-  final double apparentTemperature;
+  final int temperature;
+  final int apparentTemperature;
   final int relativeHumidity;
-  final double windSpeed;
+  final int windSpeed;
   final double precipitation;
   final int cloudCover;
   final int weatherCode;
@@ -22,10 +22,10 @@ class CurrentWeather {
   factory CurrentWeather.fromJson(Map<String, dynamic> json) {
     return CurrentWeather(
       time: DateTime.parse(json['time'] as String),
-      temperature: (json['temperature_2m'] as num).toDouble(),
-      apparentTemperature: (json['apparent_temperature'] as num).toDouble(),
+      temperature: (json['temperature_2m'] as num).round(),
+      apparentTemperature: (json['apparent_temperature'] as num).round(),
       relativeHumidity: (json['relative_humidity_2m'] as num).toInt(),
-      windSpeed: (json['wind_speed_10m'] as num).toDouble(),
+      windSpeed: (json['wind_speed_10m'] as num).round(),
       precipitation: (json['precipitation'] as num).toDouble(),
       cloudCover: (json['cloud_cover'] as num).toInt(),
       weatherCode: (json['weather_code'] as num).toInt(),

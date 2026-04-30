@@ -1,11 +1,11 @@
 class DailyWeather {
   final DateTime date;
-  final double minTemperature;
-  final double maxTemperature;
-  final double minApparentTemperature;
-  final double maxApparentTemperature;
+  final int minTemperature;
+  final int maxTemperature;
+  final int minApparentTemperature;
+  final int maxApparentTemperature;
   final int meanRelativeHumidity;
-  final double maxWindSpeed;
+  final int maxWindSpeed;
   final double precipitationSum;
   final int meanCloudCover;
   final int weatherCode;
@@ -26,14 +26,14 @@ class DailyWeather {
   factory DailyWeather.fromJson(Map<String, dynamic> json) {
     return DailyWeather(
       date: DateTime.parse(json['time'] as String),
-      minTemperature: (json['temperature_2m_min'] as num).toDouble(),
-      maxTemperature: (json['temperature_2m_max'] as num).toDouble(),
+      minTemperature: (json['temperature_2m_min'] as num).round(),
+      maxTemperature: (json['temperature_2m_max'] as num).round(),
       minApparentTemperature: (json['apparent_temperature_min'] as num)
-          .toDouble(),
+          .round(),
       maxApparentTemperature: (json['apparent_temperature_max'] as num)
-          .toDouble(),
+          .round(),
       meanRelativeHumidity: (json['relative_humidity_2m_mean'] as num).toInt(),
-      maxWindSpeed: (json['wind_speed_10m_max'] as num).toDouble(),
+      maxWindSpeed: (json['wind_speed_10m_max'] as num).round(),
       precipitationSum: (json['precipitation_sum'] as num).toDouble(),
       meanCloudCover: (json['cloud_cover_mean'] as num).toInt(),
       weatherCode: (json['weather_code'] as num).toInt(),
