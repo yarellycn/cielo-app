@@ -1,12 +1,14 @@
 import 'package:cielo_app/models/forecast_data.dart';
+import 'package:cielo_app/models/forecast_range.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/widgets/daily_forecast_card.dart';
 import 'package:flutter/material.dart';
 
 class DailyForecastList extends StatefulWidget {
   final OpenMeteoApi? api;
+  final ForecastRange selectedRange;
 
-  const DailyForecastList({super.key, this.api});
+  const DailyForecastList({super.key, this.api, required this.selectedRange});
 
   @override
   State<DailyForecastList> createState() => DailyForecastListState();
@@ -37,6 +39,13 @@ class DailyForecastListState extends State<DailyForecastList> {
       );
     } else if (snapshot.hasData) {
       final dailyWeather = snapshot.data!.dailyWeatherData;
+      final visibleDailyWeather = switch (widget.selectedRange) {
+        ForecastRange.past3Days => dailyWeather.sublist(0, 3),
+        ForecastRange.today => dailyWeather.sublist(3, 4),
+        ForecastRange.next3Days => dailyWeather.sublist(3, 7),
+        ForecastRange.next7Days => dailyWeather.sublist(3),
+        ForecastRange.all => dailyWeather,
+      };
 
       dailyWeatherWidget = LayoutBuilder(
         builder: (context, constraints) {
@@ -60,10 +69,12 @@ class DailyForecastListState extends State<DailyForecastList> {
           return Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: List.generate(dailyWeather.length, (index) {
+            children: List.generate(visibleDailyWeather.length, (index) {
               return SizedBox(
                 width: 260,
-                child: DailyForecastCard(dailyWeatherData: dailyWeather[index]),
+                child: DailyForecastCard(
+                  dailyWeatherData: visibleDailyWeather[index],
+                ),
               );
             }),
           );

@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/forecast_range.dart';
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
 import 'package:cielo_app/widgets/daily_forecast_list.dart';
@@ -28,8 +29,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => MyHomePageState();
+}
+
+class MyHomePageState extends State<MyHomePage> {
+  ForecastRange selectedRange = ForecastRange.next3Days;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +45,19 @@ class MyHomePage extends StatelessWidget {
       appBar: CieloAppBar(),
       body: ListView(
         padding: const EdgeInsets.all(30),
-        children: const [
+        children: [
           Center(child: CurrentWeatherCard()),
-          Center(child: ForecastRangeSelector()),
-          DailyForecastList(),
+          Center(
+            child: ForecastRangeSelector(
+              selectedRange: selectedRange,
+              onRangeSelected: (range) {
+                setState(() {
+                  selectedRange = range;
+                });
+              },
+            ),
+          ),
+          DailyForecastList(selectedRange: selectedRange),
         ],
       ),
     );
