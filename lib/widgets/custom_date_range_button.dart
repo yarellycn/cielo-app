@@ -10,6 +10,7 @@ class CustomDateRangeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customRangeButtonKey = GlobalKey();
+    final datePickerController = DateRangePickerController();
 
     return FilledButton.tonal(
       key: customRangeButtonKey,
@@ -41,6 +42,7 @@ class CustomDateRangeButton extends StatelessWidget {
                       width: 300,
                       height: 350,
                       child: SfDateRangePicker(
+                        controller: datePickerController,
                         headerHeight: 65.00,
                         headerStyle: DateRangePickerHeaderStyle(
                           backgroundColor: colorScheme.secondaryContainer,
@@ -56,6 +58,29 @@ class CustomDateRangeButton extends StatelessWidget {
                           today.add(const Duration(days: 3)),
                         ),
                         backgroundColor: Colors.white,
+                        onSelectionChanged: (args) {
+                          final currentPickerRange = args.value;
+
+                          if (currentPickerRange is PickerDateRange &&
+                              currentPickerRange.startDate != null &&
+                              currentPickerRange.endDate != null) {
+                            final dayCount =
+                                currentPickerRange.endDate!
+                                    .difference(currentPickerRange.startDate!)
+                                    .inDays +
+                                1;
+
+                            if (dayCount > 14) {
+                              datePickerController.selectedRange =
+                                  PickerDateRange(
+                                    currentPickerRange.startDate,
+                                    currentPickerRange.startDate!.add(
+                                      const Duration(days: 14),
+                                    ),
+                                  );
+                            }
+                          }
+                        },
                         onSubmit: (value) {
                           if (value is PickerDateRange &&
                               value.startDate != null &&
