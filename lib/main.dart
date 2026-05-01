@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Cielo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 29, 101, 195),
+          seedColor: const Color.fromARGB(255, 55, 162, 216),
         ),
       ),
       debugShowCheckedModeBanner: false,
@@ -38,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   ForecastRange selectedRange = ForecastRange.next3Days;
+  DateTimeRange? selectedCustomRange;
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +51,24 @@ class MyHomePageState extends State<MyHomePage> {
           Center(
             child: ForecastRangeSelector(
               selectedRange: selectedRange,
+              selectedCustomRange: selectedCustomRange,
               onRangeSelected: (range) {
                 setState(() {
                   selectedRange = range;
                 });
               },
+              onCustomSelectedRange: (range) {
+                setState(() {
+                  selectedRange = ForecastRange.custom;
+                  selectedCustomRange = range;
+                });
+              },
             ),
           ),
-          DailyForecastList(selectedRange: selectedRange),
+          DailyForecastList(
+            selectedRange: selectedRange,
+            selectedCustomRange: selectedCustomRange,
+          ),
         ],
       ),
     );

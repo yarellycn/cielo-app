@@ -27,7 +27,7 @@ class OpenMeteoApi {
       'daily':
           'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
       'past_days': '3',
-      'forecast_days': '8',
+      'forecast_days': '15',
       'timezone': 'Europe/Paris',
     };
 
