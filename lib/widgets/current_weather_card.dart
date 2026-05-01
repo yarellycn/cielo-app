@@ -30,7 +30,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     BuildContext context,
     AsyncSnapshot<ForecastData> snapshot,
   ) {
-    final Widget currentWeatherWidget;
+    Widget currentWeatherWidget;
     final colorScheme = Theme.of(context).colorScheme;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -43,6 +43,11 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       );
     } else if (snapshot.hasData) {
       final currentWeather = snapshot.data!.currentWeatherData;
+      if (currentWeather == null) {
+        currentWeatherWidget = const Text('No current weather available');
+        return currentWeatherWidget;
+      }
+
       final formattedDate = DateFormat(
         'EEEE d MMMM y HH:mm',
         'fr_FR',
