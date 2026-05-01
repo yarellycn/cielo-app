@@ -177,7 +177,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         ),
       ),
       child: DefaultTextStyle.merge(
-        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onPrimary),
         child: FutureBuilder<ForecastData>(
           future: forecastDataFuture,
           builder: buildCurrentWeatherWidget,

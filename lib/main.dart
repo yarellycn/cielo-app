@@ -4,6 +4,7 @@ import 'package:cielo_app/widgets/current_weather_card.dart';
 import 'package:cielo_app/widgets/daily_forecast_list.dart';
 import 'package:cielo_app/widgets/forecast_range_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cielo',
       theme: ThemeData(
+        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 55, 162, 216),
         ),

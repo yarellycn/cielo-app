@@ -130,7 +130,7 @@ class DailyForecastListState extends State<DailyForecastList> {
         ),
       ),
       child: DefaultTextStyle.merge(
-        style: const TextStyle(color: Colors.white),
+        style: theme.textTheme.bodyMedium!.copyWith(color: Colors.white),
         child: FutureBuilder<ForecastData>(
           future: forecastData,
           builder: buildDailyForecastWidget,

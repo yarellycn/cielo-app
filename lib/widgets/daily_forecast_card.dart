@@ -19,6 +19,9 @@ class DailyForecastCard extends StatelessWidget {
       'fr_FR',
     ).format(dailyWeatherData.date);
 
+    final textTheme = Theme.of(context).textTheme;
+
+
     return Container(
       padding: const EdgeInsets.all(15.00),
       decoration: BoxDecoration(
@@ -26,7 +29,7 @@ class DailyForecastCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: DefaultTextStyle(
-        style: const TextStyle(color: Colors.black),
+        style: textTheme.bodyMedium!.copyWith(color: Colors.black),
         child: Column(
           spacing: 14.00,
           crossAxisAlignment: .start,
@@ -39,7 +42,7 @@ class DailyForecastCard extends StatelessWidget {
                   children: [
                     Text(
                       '${dayOftheWeek[0].toUpperCase()}${dayOftheWeek.substring(1)}',
-                      style: const TextStyle(fontWeight: .bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(dateMonth),
                   ],
