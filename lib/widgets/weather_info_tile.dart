@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 class WeatherInfoTile extends StatelessWidget {
   final String title;
   final String information;
-  // final String weatherIcon;
+  final IconData weatherIcon;
 
   /// Creates a weather information tile.
   const WeatherInfoTile({
     super.key,
     required this.title,
     required this.information,
+    required this.weatherIcon,
   });
 
   @override
@@ -21,9 +22,13 @@ class WeatherInfoTile extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
+      child: Row(
+        spacing: 9.5,
+        children: [
+          Icon(weatherIcon, color: Colors.white, size: 15),
+          Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 4,
+            crossAxisAlignment: .start,
         children: [
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -46,6 +51,8 @@ class WeatherInfoTile extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+              ),
+            ],
           ),
         ],
       ),

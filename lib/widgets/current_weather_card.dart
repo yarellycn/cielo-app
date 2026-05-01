@@ -98,7 +98,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(Icons.wb_sunny, color: colorScheme.onPrimary),
+                          // Icon(Icons.sunny, color: colorScheme.onPrimary),
                           const SizedBox(width: 8),
                           Column(
                             children: [
@@ -132,23 +132,28 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     children: [
                       WeatherInfoTile(
                         title: 'Ressenti'.toUpperCase(),
-                        information: '${currentWeather.apparentTemperature} °C',
+                        information: '${currentWeather.apparentTemperature}°C',
+                        weatherIcon: Icons.thermostat,
                       ),
                       WeatherInfoTile(
                         title: 'Humidité'.toUpperCase(),
-                        information: '${currentWeather.relativeHumidity} %',
+                        information: '${currentWeather.relativeHumidity}%',
+                        weatherIcon: Icons.water_drop_outlined,
                       ),
                       WeatherInfoTile(
                         title: 'Vent'.toUpperCase(),
                         information: '${currentWeather.windSpeed} km/h',
+                        weatherIcon: Icons.air,
                       ),
                       WeatherInfoTile(
                         title: 'Précipitations'.toUpperCase(),
                         information: '${currentWeather.precipitation} mm',
+                        weatherIcon: Icons.cloudy_snowing,
                       ),
                       WeatherInfoTile(
                         title: 'Nuages'.toUpperCase(),
-                        information: '${currentWeather.cloudCover} %',
+                        information: '${currentWeather.cloudCover}%',
+                        weatherIcon: Icons.cloud_queue,
                       ),
                     ],
                   ),
