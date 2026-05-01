@@ -21,12 +21,36 @@ class DailyForecastList extends StatefulWidget {
 }
 
 class DailyForecastListState extends State<DailyForecastList> {
-  late final Future<ForecastData> forecastDataFuture;
+  late Future<ForecastData> forecastData;
+  final today = DateUtils.dateOnly(DateTime.now());
 
   @override
   void initState() {
     super.initState();
-    forecastDataFuture = (widget.api ?? OpenMeteoApi()).fetchForecastData();
+    forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
+      startDate: today.subtract(const Duration(days: 3)),
+      endDate: today.add(const Duration(days: 14)),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant DailyForecastList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.selectedRange == .custom &&
+        (oldWidget.selectedRange != .custom ||
+            oldWidget.selectedCustomRange != widget.selectedCustomRange)) {
+      forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
+        startDate: widget.selectedCustomRange!.start,
+        endDate: widget.selectedCustomRange!.end,
+      );
+    } else if (widget.selectedRange != .custom &&
+        oldWidget.selectedRange == .custom) {
+      forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
+        startDate: today.subtract(const Duration(days: 3)),
+        endDate: today.add(const Duration(days: 14)),
+      );
+    }
   }
 
   Widget buildDailyForecastWidget(
@@ -50,18 +74,18 @@ class DailyForecastListState extends State<DailyForecastList> {
         ForecastRange.past3Days => dailyWeather.sublist(0, 3),
         ForecastRange.today => dailyWeather.sublist(3, 4),
         ForecastRange.next3Days => dailyWeather.sublist(3, 7),
-        ForecastRange.next7Days => dailyWeather.sublist(3),
-        ForecastRange.all => dailyWeather,
+        ForecastRange.next7Days => dailyWeather.sublist(3, 11),
+        ForecastRange.all => dailyWeather.sublist(0, 11),
         ForecastRange.custom =>
-          selectedCustomRange == null
-              ? dailyWeather.sublist(3, 4)
-              : dailyWeather.where((dailyWeather) {
-                  final date = DateUtils.dateOnly(dailyWeather.date);
-                  final start = DateUtils.dateOnly(selectedCustomRange.start);
-                  final end = DateUtils.dateOnly(selectedCustomRange.end);
+        selectedCustomRange == null
+            ? dailyWeather.sublist(3, 4)
+            : dailyWeather.where((dailyWeather) {
+                final date = DateUtils.dateOnly(dailyWeather.date);
+                final start = DateUtils.dateOnly(selectedCustomRange.start);
+                final end = DateUtils.dateOnly(selectedCustomRange.end);
 
-                  return !date.isBefore(start) && !date.isAfter(end);
-                }).toList(),
+                return !date.isBefore(start) && !date.isAfter(end);
+              }).toList(),
       };
 
       dailyWeatherWidget = LayoutBuilder(
@@ -118,7 +142,7 @@ class DailyForecastListState extends State<DailyForecastList> {
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
         child: FutureBuilder<ForecastData>(
-          future: forecastDataFuture,
+          future: forecastData,
           builder: buildDailyForecastWidget,
         ),
       ),

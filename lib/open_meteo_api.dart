@@ -4,20 +4,26 @@ import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/daily_weather.dart';
 import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 /// Open-Meteo API wrapper
 class OpenMeteoApi {
   static const double defaultLatitude = 43.6083;
   static const double defaultLongitude = 3.8855;
-  static const String url = 'api.open-meteo.com';
+  static const String forecastUrl = 'api.open-meteo.com';
+  static const String archiveUrl = 'archive-api.open-meteo.com';
+  static const double latitude = defaultLatitude;
+  static const double longitude = defaultLongitude;
+
+  String apiDate(DateTime date) {
+    return DateFormat('yyyy-MM-dd').format(date);
+  }
 
   /// Fetches the current weather data for the specified latitude and longitude.
-  Future<ForecastData> fetchForecastData({
-    double latitude = defaultLatitude,
-    double longitude = defaultLongitude,
-  }) async {
-    final Map<String, String> params = {
+  Future<ForecastData> fetchForecastData() async {
+    final params = {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
       'current':
@@ -32,7 +38,7 @@ class OpenMeteoApi {
     };
 
     /// Build the URI for the API request
-    final uri = Uri.https(url, '/v1/forecast', params);
+    final uri = Uri.https(forecastUrl, '/v1/forecast', params);
     final response = await http.get(uri);
 
     /// Check if the request was successful
@@ -65,6 +71,156 @@ class OpenMeteoApi {
       currentWeatherData: CurrentWeather.fromJson(currentWeatherData),
       hourlyWeatherData: _parseHourlyWeather(hourlyWeatherData),
       dailyWeatherData: _parseDailyWeather(dailyWeatherData),
+    );
+  }
+
+  Future<ForecastData> fetchHistoricalWeatherData({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final start = DateUtils.dateOnly(startDate);
+    final end = DateUtils.dateOnly(endDate);
+
+    final Map<String, String> params = {
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+      'hourly':
+          'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
+      'daily':
+          'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
+      'start_date': apiDate(start),
+      'end_date': apiDate(end),
+      'timezone': 'Europe/Paris',
+    };
+
+    final uri = Uri.https(archiveUrl, '/v1/archive', params);
+    final response = await http.get(uri);
+
+    /// Check if the request was successful
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Open-Meteo request failed with status ${response.statusCode}',
+      );
+    }
+
+    /// Parse the JSON response
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final hourlyWeatherData = json['hourly'] as Map<String, dynamic>?;
+    final dailyWeatherData = json['daily'] as Map<String, dynamic>?;
+    log('Hourly weather data: $hourlyWeatherData');
+    log('Daily weather data: $dailyWeatherData');
+
+    if (hourlyWeatherData == null) {
+      throw Exception('Hourly weather not found in Open-Meteo response.');
+    }
+    if (dailyWeatherData == null) {
+      throw Exception('Daily weather not found in Open-Meteo response.');
+    }
+
+    return ForecastData(
+      hourlyWeatherData: _parseHourlyWeather(hourlyWeatherData),
+      dailyWeatherData: _parseDailyWeather(dailyWeatherData),
+    );
+  }
+
+  Future<ForecastData> fetchForecastWeatherDataForRange({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final params = {
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+      'current':
+          'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
+      'hourly':
+          'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,weather_code',
+      'daily':
+          'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
+      'start_date': apiDate(startDate),
+      'end_date': apiDate(endDate),
+      'timezone': 'Europe/Paris',
+    };
+
+    /// Build the URI for the API request
+    final uri = Uri.https(forecastUrl, '/v1/forecast', params);
+    final response = await http.get(uri);
+
+    /// Check if the request was successful
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Open-Meteo request failed with status ${response.statusCode}',
+      );
+    }
+
+    /// Parse the JSON response
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final currentWeatherData = json['current'] as Map<String, dynamic>?;
+    final hourlyWeatherData = json['hourly'] as Map<String, dynamic>?;
+    final dailyWeatherData = json['daily'] as Map<String, dynamic>?;
+    log('Current weather data: $currentWeatherData');
+    log('Hourly weather data: $hourlyWeatherData');
+    log('Daily weather data: $dailyWeatherData');
+
+    if (currentWeatherData == null) {
+      throw Exception('Current weather not found in Open-Meteo response.');
+    }
+    if (hourlyWeatherData == null) {
+      throw Exception('Hourly weather not found in Open-Meteo response.');
+    }
+    if (dailyWeatherData == null) {
+      throw Exception('Daily weather not found in Open-Meteo response.');
+    }
+
+    return ForecastData(
+      currentWeatherData: CurrentWeather.fromJson(currentWeatherData),
+      hourlyWeatherData: _parseHourlyWeather(hourlyWeatherData),
+      dailyWeatherData: _parseDailyWeather(dailyWeatherData),
+    );
+  }
+
+  Future<ForecastData> fetchWeatherDataForRange({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final oldestForecastDate = today.subtract(const Duration(days: 3));
+
+    if (endDate.isBefore(oldestForecastDate)) {
+      return fetchHistoricalWeatherData(startDate: startDate, endDate: endDate);
+    }
+
+    if (!startDate.isBefore(oldestForecastDate)) {
+      // Entire range is inside forecast API range
+      return fetchForecastWeatherDataForRange(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    }
+
+    final historicalEndDate = oldestForecastDate.subtract(
+      const Duration(days: 1),
+    );
+
+    final historicalData = await fetchHistoricalWeatherData(
+      startDate: startDate,
+      endDate: historicalEndDate,
+    );
+
+    final forecastData = await fetchForecastWeatherDataForRange(
+      startDate: oldestForecastDate,
+      endDate: endDate,
+    );
+
+    return ForecastData(
+      currentWeatherData: forecastData.currentWeatherData,
+      hourlyWeatherData: [
+        ...historicalData.hourlyWeatherData,
+        ...forecastData.hourlyWeatherData,
+      ],
+      dailyWeatherData: [
+        ...historicalData.dailyWeatherData,
+        ...forecastData.dailyWeatherData,
+      ],
     );
   }
 
