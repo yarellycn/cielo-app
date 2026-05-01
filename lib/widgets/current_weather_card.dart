@@ -1,6 +1,7 @@
 import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
+import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +34,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     AsyncSnapshot<ForecastData> snapshot,
   ) {
     Widget currentWeatherWidget;
+    final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -40,7 +42,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     } else if (snapshot.hasError) {
       currentWeatherWidget = Text(
         'Unable to load weather data: ${snapshot.error}',
-        style: Theme.of(context).textTheme.headlineSmall,
+        style: textTheme.headlineSmall,
         textAlign: TextAlign.center,
       );
     } else if (snapshot.hasData) {
@@ -55,8 +57,8 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         'fr_FR',
       ).format(currentWeather.time);
       const cardPadding = 35.0;
-      const tileWidth = 130.0;
-      const tileHeight = 60.0;
+      const tileWidth = 135.0;
+      const tileHeight = 55.0;
       const tileSpacing = 12.0;
 
       currentWeatherWidget = Container(
@@ -90,24 +92,41 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                     crossAxisAlignment: .start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Météo Actuelle'.toUpperCase()),
+                      Text(
+                        'Météo Actuelle'.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.secondaryTextOnPrimary,
+                        ),
+                      ),
                       Text(
                         '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
                       ),
-                      Text('Montpellier'),
+                      Text(
+                        'Montpellier',
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           // Icon(Icons.sunny, color: colorScheme.onPrimary),
                           const SizedBox(width: 8),
                           Column(
+                            crossAxisAlignment: .start,
                             children: [
-                              Text('${currentWeather.temperature} °C'),
+                              Text(
+                                '${currentWeather.temperature}°C',
+                                style: textTheme.displayLarge,
+                              ),
                               Text(
                                 WeatherCode.fromCode(
                                       currentWeather.weatherCode,
                                     )?.description ??
                                     'Unknown currentWeather',
+                                style: const TextStyle(
+                                  color: AppColors.secondaryTextOnPrimary,
+                                ),
                               ),
                             ],
                           ),
@@ -182,7 +201,9 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         ),
       ),
       child: DefaultTextStyle.merge(
-        style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onPrimary),
+        style: theme.textTheme.bodySmall!.copyWith(
+          color: theme.colorScheme.onPrimary,
+        ),
         child: FutureBuilder<ForecastData>(
           future: forecastDataFuture,
           builder: buildCurrentWeatherWidget,
