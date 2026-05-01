@@ -22,7 +22,9 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
   @override
   void initState() {
     super.initState();
-    forecastDataFuture = (widget.api ?? OpenMeteoApi()).fetchForecastData();
+    final today = DateUtils.dateOnly(DateTime.now());
+    forecastDataFuture = (widget.api ?? OpenMeteoApi())
+        .fetchWeatherDataForRange(startDate: today, endDate: today);
   }
 
   /// Builds the card contents for the current [forecastDataFuture] snapshot.

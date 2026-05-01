@@ -29,7 +29,7 @@ class DailyForecastListState extends State<DailyForecastList> {
     super.initState();
     forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
       startDate: today.subtract(const Duration(days: 3)),
-      endDate: today.add(const Duration(days: 14)),
+      endDate: today.add(const Duration(days: 7)),
     );
   }
 
@@ -48,7 +48,7 @@ class DailyForecastListState extends State<DailyForecastList> {
         oldWidget.selectedRange == .custom) {
       forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
         startDate: today.subtract(const Duration(days: 3)),
-        endDate: today.add(const Duration(days: 14)),
+        endDate: today.add(const Duration(days: 7)),
       );
     }
   }
@@ -69,23 +69,13 @@ class DailyForecastListState extends State<DailyForecastList> {
       );
     } else if (snapshot.hasData) {
       final dailyWeather = snapshot.data!.dailyWeatherData;
-      final selectedCustomRange = widget.selectedCustomRange;
       final visibleDailyWeather = switch (widget.selectedRange) {
         ForecastRange.past3Days => dailyWeather.sublist(0, 3),
         ForecastRange.today => dailyWeather.sublist(3, 4),
         ForecastRange.next3Days => dailyWeather.sublist(3, 7),
         ForecastRange.next7Days => dailyWeather.sublist(3, 11),
-        ForecastRange.all => dailyWeather.sublist(0, 11),
-        ForecastRange.custom =>
-        selectedCustomRange == null
-            ? dailyWeather.sublist(3, 4)
-            : dailyWeather.where((dailyWeather) {
-                final date = DateUtils.dateOnly(dailyWeather.date);
-                final start = DateUtils.dateOnly(selectedCustomRange.start);
-                final end = DateUtils.dateOnly(selectedCustomRange.end);
-
-                return !date.isBefore(start) && !date.isAfter(end);
-              }).toList(),
+        ForecastRange.all => dailyWeather,
+        ForecastRange.custom => dailyWeather,
       };
 
       dailyWeatherWidget = LayoutBuilder(
