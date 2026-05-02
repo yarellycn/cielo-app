@@ -79,7 +79,7 @@ class MyHomePageState extends State<MyHomePage> {
             selectedRange: selectedRange,
             selectedCustomRange: selectedCustomRange,
           ),
-        ],
+        ].expand((widget) => [widget, const SizedBox(height: 20)]).toList(),
       ),
     );
   }
