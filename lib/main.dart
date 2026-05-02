@@ -1,4 +1,5 @@
 import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
 import 'package:cielo_app/widgets/daily_forecast_list.dart';
@@ -45,6 +46,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.mainBackgroundColor,
       appBar: CieloAppBar(),
       body: ListView(
         padding: const EdgeInsets.all(30),
