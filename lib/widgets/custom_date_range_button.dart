@@ -1,4 +1,5 @@
 import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -46,8 +47,13 @@ class CustomDateRangeButton extends StatelessWidget {
 
     final label =
         '${formatter.format(dateRange.start)} - ${formatter.format(dateRange.end)}';
+    final isSelected = selectedRange == ForecastRange.custom;
 
-    return FilledButton.tonal(
+    return FilledButton(
+      style: AppButtonStyles.customDateRangeButton(
+        context,
+        isSelected: isSelected,
+      ),
       key: customRangeButtonKey,
       onPressed: () async {
         final colorScheme = Theme.of(context).colorScheme;
@@ -148,7 +154,10 @@ class CustomDateRangeButton extends StatelessWidget {
           ),
         );
       },
-      child: Text(label),
+      child: Row(
+        spacing: 8,
+        children: [Icon(Icons.date_range, size: 15.00), Text(label)],
+      ),
     );
   }
 }
