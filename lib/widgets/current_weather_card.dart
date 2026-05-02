@@ -70,7 +70,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final availableWidth = constraints.maxWidth;
-            final leftColumnWidth = availableWidth * 0.25;
+            final leftColumnWidth = availableWidth * 0.50;
             final maxGridWidth = (tileWidth * 2) + tileSpacing;
             final availableGridWidth = availableWidth - leftColumnWidth;
             final gridWidth = (availableGridWidth >= maxGridWidth)
@@ -210,5 +210,6 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         ),
       ),
     );
+    // );
   }
 }
