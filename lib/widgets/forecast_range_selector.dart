@@ -34,10 +34,12 @@ class ForecastRangeSelector extends StatelessWidget {
     }
 
     return Card(
-      elevation: 3,
+      elevation: 2,
       color: const Color.fromARGB(255, 255, 255, 255),
       child: DefaultTextStyle.merge(
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.forecastButtonText),
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.copyWith(color: AppColors.forecastButtonText),
         child: Padding(
           padding: EdgeInsets.all(15.00),
           child: Row(
@@ -66,7 +68,11 @@ class ForecastRangeSelector extends StatelessWidget {
               Row(
                 spacing: 8.00,
                 children: [
-                  Icon(Icons.date_range, size: 15.00, color: AppColors.forecastButtonText),
+                  Icon(
+                    Icons.date_range,
+                    size: 15.00,
+                    color: AppColors.forecastButtonText,
+                  ),
                   Text('Intervalle:'),
                   CustomDateRangeButton(
                     selectedRange: selectedRange,
