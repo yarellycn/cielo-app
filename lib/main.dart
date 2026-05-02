@@ -46,7 +46,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     const double widgetWidth = 1250.00;
-    const double homePadding = 30;
+    const double homePadding = 20;
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
