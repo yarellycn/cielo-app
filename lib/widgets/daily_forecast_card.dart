@@ -11,6 +11,7 @@ class DailyForecastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final today = DateUtils.dateOnly(DateTime.now());
     final dayOftheWeek = DateFormat(
       'EEEE',
       'fr_FR',
@@ -19,6 +20,8 @@ class DailyForecastCard extends StatelessWidget {
       'd MMMM',
       'fr_FR',
     ).format(dailyWeatherData.date);
+
+    final isItToday = dailyWeatherData.date == today;
 
     final textTheme = Theme.of(context).textTheme.bodySmall;
     final double parametersRowSpacing = 10;
@@ -34,7 +37,18 @@ class DailyForecastCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      color: const Color.fromARGB(255, 255, 255, 255),
+      color: isItToday
+          ? AppColors.highlightedItemBackground
+          : Color.fromARGB(255, 255, 255, 255),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isItToday
+              ? AppColors.highlightedItemBorder
+              : Colors.transparent,
+          width: 2,
+        ),
+      ),
       child: DefaultTextStyle(
         style: textTheme!.copyWith(
           color: AppColors.forecastButtonText,
@@ -54,9 +68,13 @@ class DailyForecastCard extends StatelessWidget {
                       crossAxisAlignment: .start,
                       children: [
                         Text(
-                          '${dayOftheWeek[0].toUpperCase()}${dayOftheWeek.substring(1)}',
-                          style: const TextStyle(
-                            color: Colors.black,
+                          isItToday
+                              ? "Aujourd'hui"
+                              : '${dayOftheWeek[0].toUpperCase()}${dayOftheWeek.substring(1)}',
+                          style: TextStyle(
+                            color: isItToday
+                                ? AppColors.highlightedItemText
+                                : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
