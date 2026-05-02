@@ -45,41 +45,59 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    const double widgetWidth = 1250.00;
+    const double homePadding = 30;
+
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
       appBar: CieloAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.all(30),
-        children: [
-          Center(child: CurrentWeatherCard()),
-          Center(
-            child: ForecastRangeSelector(
-              selectedRange: selectedRange,
-              selectedCustomRange: selectedCustomRange,
-              onRangeSelected: (range) {
-                setState(() {
-                  selectedRange = range;
-                });
-              },
-              onCustomSelectedRange: (range) {
-                setState(() {
-                  selectedRange = ForecastRange.custom;
-                  selectedCustomRange = range;
-                });
-              },
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final contentWidth = constraints.maxWidth < widgetWidth
+              ? constraints.maxWidth
+              : widgetWidth;
+
+          return Center(
+            child: SizedBox(
+              width: contentWidth,
+              child: ListView(
+                padding: const EdgeInsets.all(homePadding),
+                children:
+                    [
+                          CurrentWeatherCard(),
+                          ForecastRangeSelector(
+                            selectedRange: selectedRange,
+                            selectedCustomRange: selectedCustomRange,
+                            onRangeSelected: (range) {
+                              setState(() {
+                                selectedRange = range;
+                              });
+                            },
+                            onCustomSelectedRange: (range) {
+                              setState(() {
+                                selectedRange = ForecastRange.custom;
+                                selectedCustomRange = range;
+                              });
+                            },
+                          ),
+                          Text(
+                            'Prévisons journalières',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          DailyForecastList(
+                            selectedRange: selectedRange,
+                            selectedCustomRange: selectedCustomRange,
+                          ),
+                        ]
+                        .expand(
+                          (widget) => [widget, const SizedBox(height: 20)],
+                        )
+                        .toList(),
+              ),
             ),
-          ),
-          Text(
-            'Prévisons journalières',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          DailyForecastList(
-            selectedRange: selectedRange,
-            selectedCustomRange: selectedCustomRange,
-          ),
-        ].expand((widget) => [widget, const SizedBox(height: 20)]).toList(),
+          );
+        },
       ),
     );
   }
