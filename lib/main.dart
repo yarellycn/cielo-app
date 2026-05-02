@@ -69,6 +69,12 @@ class MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
+          Text(
+            'Prévisons journalières',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
           DailyForecastList(
             selectedRange: selectedRange,
             selectedCustomRange: selectedCustomRange,
