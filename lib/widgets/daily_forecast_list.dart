@@ -102,7 +102,7 @@ class DailyForecastListState extends State<DailyForecastList> {
             runSpacing: 12,
             children: List.generate(visibleDailyWeather.length, (index) {
               return SizedBox(
-                width: 260,
+                width: 270,
                 child: DailyForecastCard(
                   dailyWeatherData: visibleDailyWeather[index],
                 ),
