@@ -25,7 +25,7 @@ class CustomDateRangeButton extends StatelessWidget {
     final dateRange = switch (selectedRange) {
       ForecastRange.past3Days => DateTimeRange(
         start: today.subtract(const Duration(days: 3)),
-        end: today,
+        end: today.subtract(const Duration(days: 1)),
       ),
       ForecastRange.today => DateTimeRange(start: today, end: today),
       ForecastRange.next3Days => DateTimeRange(
