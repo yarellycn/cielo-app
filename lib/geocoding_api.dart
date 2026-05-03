@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:cielo_app/models/city_data.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +27,7 @@ class GeocodingApi {
     /// Parse the JSON response
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final cityResults = json['results'] as List<dynamic>?;
-    log('City data: $cityResults');
+    // log('City data: $cityResults');
 
     if (cityResults == null) {
       return [];

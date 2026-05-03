@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/daily_weather.dart';
 import 'package:cielo_app/models/forecast_data.dart';
@@ -56,8 +55,8 @@ class OpenMeteoApi {
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final hourlyWeatherData = json['hourly'] as Map<String, dynamic>?;
     final dailyWeatherData = json['daily'] as Map<String, dynamic>?;
-    log('Hourly weather data: $hourlyWeatherData');
-    log('Daily weather data: $dailyWeatherData');
+    // log('Hourly weather data: $hourlyWeatherData');
+    // log('Daily weather data: $dailyWeatherData');
 
     if (hourlyWeatherData == null) {
       throw Exception('Hourly weather not found in Open-Meteo response.');
@@ -111,9 +110,9 @@ class OpenMeteoApi {
     final currentWeatherData = json['current'] as Map<String, dynamic>?;
     final hourlyWeatherData = json['hourly'] as Map<String, dynamic>?;
     final dailyWeatherData = json['daily'] as Map<String, dynamic>?;
-    log('Current weather data: $currentWeatherData');
-    log('Hourly weather data: $hourlyWeatherData');
-    log('Daily weather data: $dailyWeatherData');
+    // log('Current weather data: $currentWeatherData');
+    // log('Hourly weather data: $hourlyWeatherData');
+    // log('Daily weather data: $dailyWeatherData');
 
     if (currentWeatherData == null) {
       throw Exception('Current weather not found in Open-Meteo response.');
