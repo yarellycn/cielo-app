@@ -89,7 +89,7 @@ class CustomDateRangeButton extends StatelessWidget {
                           textStyle: TextStyle(fontWeight: .bold),
                         ),
                         selectionMode: DateRangePickerSelectionMode.range,
-                        minDate: today.subtract(const Duration(days: 15)),
+                        minDate: DateTime(1950, 1, 1),
                         maxDate: today.add(const Duration(days: 14)),
                         showNavigationArrow: true,
                         showActionButtons: true,
