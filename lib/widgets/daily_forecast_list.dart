@@ -89,7 +89,12 @@ class DailyForecastListState extends State<DailyForecastList> {
     final Widget dailyWeatherWidget;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
-      dailyWeatherWidget = const CircularProgressIndicator();
+      dailyWeatherWidget = const Center(
+        child: SizedBox.square(
+          dimension: 32,
+          child: CircularProgressIndicator(),
+        ),
+      );
     } else if (snapshot.hasError) {
       dailyWeatherWidget = Text(
         'Unable to load weather data: ${snapshot.error}',

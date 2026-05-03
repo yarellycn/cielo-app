@@ -73,7 +73,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
     final textTheme = Theme.of(context).textTheme;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
-      currentWeatherWidget = const CircularProgressIndicator();
+      currentWeatherWidget = const Center(
+        child: SizedBox.square(
+          dimension: 32,
+          child: CircularProgressIndicator(),
+        ),
+      );
     } else if (snapshot.hasError) {
       currentWeatherWidget = Text(
         'Unable to load weather data: ${snapshot.error}',
