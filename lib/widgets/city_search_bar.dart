@@ -27,7 +27,44 @@ class CitySearchBarState extends State<CitySearchBar> {
           borderRadius: BorderRadius.circular(12),
           clipBehavior: .antiAlias,
           child: Autocomplete<CityData>(
-            displayStringForOption: (city) => '${city.name}, ${city.admin1}, ${city.country}',
+            displayStringForOption: (city) =>
+                '${city.name}, ${city.admin1}, ${city.country}',
+            optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4,
+                  borderRadius: BorderRadius.circular(12),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 500,
+                      maxHeight: 260,
+                    ),
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: options.length,
+                      itemBuilder: (context, index) {
+                        final city = options.elementAt(index);
+
+                        return ListTile(
+                          leading: const Icon(
+                            Icons.pin_drop,
+                            color: Colors.blue,
+                          ),
+                          title: Text(
+                            city.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text('${city.admin1}, ${city.country}'),
+                          onTap: () => onSelected(city),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
             onSelected: (city) {
               widget.onCitySelected?.call(city);
             },

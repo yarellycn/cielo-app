@@ -67,7 +67,7 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          CitySearchBar(onCitySelected: onCitySelected,),
+          CitySearchBar(onCitySelected: onCitySelected),
         ],
       ),
     );
