@@ -60,133 +60,136 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       const tileHeight = 55.0;
       const tileSpacing = 12.0;
 
-      currentWeatherWidget = Container(
-        decoration: BoxDecoration(
-          // color: Colors.blueAccent,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.mainCardBackgroundPrimaryColor,
-              AppColors.mainCardBackgroundSecondaryColor,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.all(cardPadding),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final availableWidth = constraints.maxWidth;
-            final leftColumnWidth = availableWidth * 0.50;
-            final maxGridWidth = (tileWidth * 2) + tileSpacing;
-            final availableGridWidth = availableWidth - leftColumnWidth;
-            final gridWidth = (availableGridWidth >= maxGridWidth)
-                ? maxGridWidth
-                : tileWidth;
-            final columnCount = gridWidth >= maxGridWidth ? 2 : 1;
-            final rowCount = (5 / columnCount).ceil();
-            final gridHeight =
-                (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: leftColumnWidth,
-                  child: Column(
-                    spacing: 4,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: .start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Météo Actuelle'.toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.secondaryTextOnPrimary,
-                        ),
-                      ),
-                      Text(
-                        '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
-                      ),
-                      Text(
-                        'Montpellier',
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // Icon(Icons.sunny, color: colorScheme.onPrimary),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(
-                                '${currentWeather.temperature}°C',
-                                style: textTheme.displayLarge,
-                              ),
-                              Text(
-                                WeatherCode.fromCode(
-                                      currentWeather.weatherCode,
-                                    )?.description ??
-                                    'Unknown currentWeather',
-                                style: const TextStyle(
-                                  color: AppColors.secondaryTextOnPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: gridWidth,
-                  height: gridHeight,
-                  child: GridView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columnCount,
-                      mainAxisExtent: tileHeight,
-                      mainAxisSpacing: tileSpacing,
-                      crossAxisSpacing: tileSpacing,
-                    ),
-                    children: [
-                      WeatherInfoTile(
-                        title: 'Ressenti'.toUpperCase(),
-                        information: '${currentWeather.apparentTemperature}°C',
-                        weatherIcon: Icons.thermostat,
-                      ),
-                      WeatherInfoTile(
-                        title: 'Humidité'.toUpperCase(),
-                        information: '${currentWeather.relativeHumidity}%',
-                        weatherIcon: Icons.water_drop_outlined,
-                      ),
-                      WeatherInfoTile(
-                        title: 'Vent'.toUpperCase(),
-                        information: '${currentWeather.windSpeed} km/h',
-                        weatherIcon: Icons.air,
-                      ),
-                      WeatherInfoTile(
-                        title: 'Précipitations'.toUpperCase(),
-                        information: '${currentWeather.precipitation} mm',
-                        weatherIcon: Icons.cloudy_snowing,
-                      ),
-                      WeatherInfoTile(
-                        title: 'Nuages'.toUpperCase(),
-                        information: '${currentWeather.cloudCover}%',
-                        weatherIcon: Icons.cloud_queue,
-                      ),
-                    ],
-                  ),
-                ),
+      currentWeatherWidget = Card(
+        elevation: 5,
+        margin: EdgeInsets.zero,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.mainCardBackgroundPrimaryColor,
+                AppColors.mainCardBackgroundSecondaryColor,
               ],
-            );
-          },
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(cardPadding),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final availableWidth = constraints.maxWidth;
+              final leftColumnWidth = availableWidth * 0.50;
+              final maxGridWidth = (tileWidth * 2) + tileSpacing;
+              final availableGridWidth = availableWidth - leftColumnWidth;
+              final gridWidth = (availableGridWidth >= maxGridWidth)
+                  ? maxGridWidth
+                  : tileWidth;
+              final columnCount = gridWidth >= maxGridWidth ? 2 : 1;
+              final rowCount = (5 / columnCount).ceil();
+              final gridHeight =
+                  (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
+        
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: leftColumnWidth,
+                    child: Column(
+                      spacing: 4,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: .start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Météo Actuelle'.toUpperCase(),
+                          style: const TextStyle(
+                            color: AppColors.secondaryTextOnPrimary,
+                          ),
+                        ),
+                        Text(
+                          '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
+                        ),
+                        Text(
+                          'Montpellier',
+                          style: textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Icon(Icons.sunny, color: colorScheme.onPrimary),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Text(
+                                  '${currentWeather.temperature}°C',
+                                  style: textTheme.displayLarge,
+                                ),
+                                Text(
+                                  WeatherCode.fromCode(
+                                        currentWeather.weatherCode,
+                                      )?.description ??
+                                      'Unknown currentWeather',
+                                  style: const TextStyle(
+                                    color: AppColors.secondaryTextOnPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: gridWidth,
+                    height: gridHeight,
+                    child: GridView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columnCount,
+                        mainAxisExtent: tileHeight,
+                        mainAxisSpacing: tileSpacing,
+                        crossAxisSpacing: tileSpacing,
+                      ),
+                      children: [
+                        WeatherInfoTile(
+                          title: 'Ressenti'.toUpperCase(),
+                          information: '${currentWeather.apparentTemperature}°C',
+                          weatherIcon: Icons.thermostat,
+                        ),
+                        WeatherInfoTile(
+                          title: 'Humidité'.toUpperCase(),
+                          information: '${currentWeather.relativeHumidity}%',
+                          weatherIcon: Icons.water_drop_outlined,
+                        ),
+                        WeatherInfoTile(
+                          title: 'Vent'.toUpperCase(),
+                          information: '${currentWeather.windSpeed} km/h',
+                          weatherIcon: Icons.air,
+                        ),
+                        WeatherInfoTile(
+                          title: 'Précipitations'.toUpperCase(),
+                          information: '${currentWeather.precipitation} mm',
+                          weatherIcon: Icons.cloudy_snowing,
+                        ),
+                        WeatherInfoTile(
+                          title: 'Nuages'.toUpperCase(),
+                          information: '${currentWeather.cloudCover}%',
+                          weatherIcon: Icons.cloud_queue,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       );
     } else {
