@@ -8,12 +8,14 @@ class DailyForecastList extends StatefulWidget {
   final OpenMeteoApi? api;
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
+  final double widgetWidth;
 
   const DailyForecastList({
     super.key,
     this.api,
     required this.selectedRange,
     required this.selectedCustomRange,
+    required this.widgetWidth,
   });
 
   @override
@@ -80,29 +82,26 @@ class DailyForecastListState extends State<DailyForecastList> {
 
       dailyWeatherWidget = LayoutBuilder(
         builder: (context, constraints) {
-          // final columnCount = 3;
-          // final cardHeight = 220.0;
-          // final cardSpacing = 12.0;
+          final double wrapSpacing = 8;
+          final availableWidth = constraints.maxWidth;
+          final minDailyForecastWidth =
+              (widget.widgetWidth - (wrapSpacing * 3)) / 4;
 
-          // return GridView(
-          //   shrinkWrap: true,
-          //   physics: const NeverScrollableScrollPhysics(),
-          //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //     crossAxisCount: columnCount,
-          //     mainAxisExtent: cardHeight,
-          //     mainAxisSpacing: cardSpacing,
-          //     crossAxisSpacing: cardSpacing,
-          //   ),
-          //   children: List.generate(dailyWeather.length, (index) {
-          //     return DailyForecastCard(dailyWeatherData: dailyWeather[index]);
-          //   }),
-          // );
+          double cardWidth = availableWidth;
+          for (var i = 1; i < 5; i++) {
+            double potentialCardWidth =
+                (availableWidth - wrapSpacing * (i - 1)) / i;
+            if (potentialCardWidth >= minDailyForecastWidth) {
+              cardWidth = potentialCardWidth;
+            }
+          }
+
           return Wrap(
-            spacing: 12,
-            runSpacing: 12,
+            spacing: wrapSpacing,
+            runSpacing: wrapSpacing,
             children: List.generate(visibleDailyWeather.length, (index) {
               return SizedBox(
-                width: 270,
+                width: cardWidth,
                 child: DailyForecastCard(
                   dailyWeatherData: visibleDailyWeather[index],
                 ),

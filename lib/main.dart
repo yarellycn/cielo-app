@@ -88,6 +88,7 @@ class MyHomePageState extends State<MyHomePage> {
                           DailyForecastList(
                             selectedRange: selectedRange,
                             selectedCustomRange: selectedCustomRange,
+                            widgetWidth: widgetWidth - homePadding * 2,
                           ),
                         ]
                         .expand(
