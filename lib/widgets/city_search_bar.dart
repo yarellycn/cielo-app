@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 class CitySearchBar extends StatefulWidget {
   final GeocodingApi? api;
-  const CitySearchBar({super.key, this.api});
+  final ValueChanged<CityData>? onCitySelected;
+
+  const CitySearchBar({super.key, this.api, this.onCitySelected});
 
   @override
   State<CitySearchBar> createState() => CitySearchBarState();
@@ -26,6 +28,9 @@ class CitySearchBarState extends State<CitySearchBar> {
           clipBehavior: .antiAlias,
           child: Autocomplete<CityData>(
             displayStringForOption: (city) => city.name,
+            onSelected: (city) {
+              widget.onCitySelected?.call(city);
+            },
             optionsBuilder: (TextEditingValue textEditingValue) async {
               final query = textEditingValue.text.trim();
 

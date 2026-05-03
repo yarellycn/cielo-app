@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/city_data.dart';
 import 'package:cielo_app/models/forecast_range.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
@@ -42,6 +43,7 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   ForecastRange selectedRange = ForecastRange.next3Days;
   DateTimeRange? selectedCustomRange;
+  CityData? selectedCity;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,13 @@ class MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
-      appBar: CieloAppBar(),
+      appBar: CieloAppBar(
+        onCitySelected: (city) {
+          setState(() {
+            selectedCity = city;
+          });
+        },
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final contentWidth = constraints.maxWidth < widgetWidth
@@ -64,7 +72,7 @@ class MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(homePadding),
                 children:
                     [
-                          CurrentWeatherCard(),
+                          CurrentWeatherCard(selectedCity: selectedCity),
                           ForecastRangeSelector(
                             selectedRange: selectedRange,
                             selectedCustomRange: selectedCustomRange,
@@ -89,6 +97,7 @@ class MyHomePageState extends State<MyHomePage> {
                             selectedRange: selectedRange,
                             selectedCustomRange: selectedCustomRange,
                             widgetWidth: widgetWidth - homePadding * 2,
+                            selectedCity: selectedCity,
                           ),
                         ]
                         .expand(

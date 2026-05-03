@@ -1,9 +1,12 @@
+import 'package:cielo_app/models/city_data.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/city_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CieloAppBar({super.key});
+  final ValueChanged<CityData>? onCitySelected;
+
+  const CieloAppBar({super.key, this.onCitySelected});
   static const appBarHeight = 75.00;
   static const _iconSize = 40.00;
   static const _logoWidth = 85.00;
@@ -64,7 +67,7 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          CitySearchBar(),
+          CitySearchBar(onCitySelected: onCitySelected,),
         ],
       ),
     );

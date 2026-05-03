@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/city_data.dart';
 import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/forecast_range.dart';
 import 'package:cielo_app/open_meteo_api.dart';
@@ -9,6 +10,7 @@ class DailyForecastList extends StatefulWidget {
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
   final double widgetWidth;
+  final CityData? selectedCity;
 
   const DailyForecastList({
     super.key,
@@ -16,6 +18,7 @@ class DailyForecastList extends StatefulWidget {
     required this.selectedRange,
     required this.selectedCustomRange,
     required this.widgetWidth,
+    required this.selectedCity,
   });
 
   @override
@@ -26,12 +29,23 @@ class DailyForecastListState extends State<DailyForecastList> {
   late Future<ForecastData> forecastData;
   final today = DateUtils.dateOnly(DateTime.now());
 
+  double getLatitude() {
+    return widget.selectedCity?.latitude ?? OpenMeteoApi.defaultLatitude;
+  }
+
+  double getLongitude() {
+    return widget.selectedCity?.longitude ?? OpenMeteoApi.defaultLongitude;
+  }
+
   @override
   void initState() {
     super.initState();
+
     forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
       startDate: today.subtract(const Duration(days: 3)),
       endDate: today.add(const Duration(days: 7)),
+      latitude: getLatitude(),
+      longitude: getLongitude(),
     );
   }
 
@@ -39,18 +53,31 @@ class DailyForecastListState extends State<DailyForecastList> {
   void didUpdateWidget(covariant DailyForecastList oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.selectedRange == .custom &&
+    final locationHasChanged =
+        oldWidget.selectedCity?.latitude != widget.selectedCity?.latitude ||
+        oldWidget.selectedCity?.longitude != widget.selectedCity?.longitude;
+    final shouldReloadCustomRangeRequest =
+        (widget.selectedRange == .custom &&
         (oldWidget.selectedRange != .custom ||
-            oldWidget.selectedCustomRange != widget.selectedCustomRange)) {
+            oldWidget.selectedCustomRange != widget.selectedCustomRange));
+    final shouldReloadDefaultRangeRequest =
+        (widget.selectedRange != .custom && oldWidget.selectedRange == .custom);
+
+    if (shouldReloadCustomRangeRequest ||
+        (locationHasChanged && widget.selectedRange == .custom)) {
       forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
         startDate: widget.selectedCustomRange!.start,
         endDate: widget.selectedCustomRange!.end,
+        latitude: getLatitude(),
+        longitude: getLongitude(),
       );
-    } else if (widget.selectedRange != .custom &&
-        oldWidget.selectedRange == .custom) {
+    } else if (shouldReloadDefaultRangeRequest ||
+        (locationHasChanged && widget.selectedRange != .custom)) {
       forecastData = (widget.api ?? OpenMeteoApi()).fetchWeatherDataForRange(
         startDate: today.subtract(const Duration(days: 3)),
         endDate: today.add(const Duration(days: 7)),
+        latitude: getLatitude(),
+        longitude: getLongitude(),
       );
     }
   }

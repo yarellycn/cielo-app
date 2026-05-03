@@ -14,8 +14,7 @@ class OpenMeteoApi {
   static const double defaultLongitude = 3.8855;
   static const String forecastUrl = 'api.open-meteo.com';
   static const String archiveUrl = 'archive-api.open-meteo.com';
-  static const double latitude = defaultLatitude;
-  static const double longitude = defaultLongitude;
+  static const String localTimezone = 'auto';
 
   String apiDate(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
@@ -25,6 +24,8 @@ class OpenMeteoApi {
   Future<ForecastData> fetchHistoricalWeatherData({
     required DateTime startDate,
     required DateTime endDate,
+    required double latitude,
+    required double longitude,
   }) async {
     final start = DateUtils.dateOnly(startDate);
     final end = DateUtils.dateOnly(endDate);
@@ -74,6 +75,8 @@ class OpenMeteoApi {
   Future<ForecastData> fetchForecastWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
+    required double latitude,
+    required double longitude,
   }) async {
     final params = {
       'latitude': latitude.toString(),
@@ -129,12 +132,19 @@ class OpenMeteoApi {
   Future<ForecastData> fetchWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
+    required double latitude,
+    required double longitude,
   }) async {
     final today = DateUtils.dateOnly(DateTime.now());
     final oldestForecastDate = today.subtract(const Duration(days: 3));
 
     if (endDate.isBefore(oldestForecastDate)) {
-      return fetchHistoricalWeatherData(startDate: startDate, endDate: endDate);
+      return fetchHistoricalWeatherData(
+        startDate: startDate,
+        endDate: endDate,
+        latitude: latitude,
+        longitude: longitude,
+      );
     }
 
     if (!startDate.isBefore(oldestForecastDate)) {
@@ -142,6 +152,8 @@ class OpenMeteoApi {
       return fetchForecastWeatherDataForRange(
         startDate: startDate,
         endDate: endDate,
+        latitude: latitude,
+        longitude: longitude,
       );
     }
 
@@ -152,11 +164,15 @@ class OpenMeteoApi {
     final historicalData = await fetchHistoricalWeatherData(
       startDate: startDate,
       endDate: historicalEndDate,
+      latitude: latitude,
+      longitude: longitude,
     );
 
     final forecastData = await fetchForecastWeatherDataForRange(
       startDate: oldestForecastDate,
       endDate: endDate,
+      latitude: latitude,
+      longitude: longitude,
     );
 
     return ForecastData(

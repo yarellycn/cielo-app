@@ -1,3 +1,4 @@
+import 'package:cielo_app/models/city_data.dart';
 import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/open_meteo_api.dart';
@@ -9,8 +10,9 @@ import 'package:intl/intl.dart';
 /// A widget that displays the current weather data fetched from the Open-Meteo API.
 class CurrentWeatherCard extends StatefulWidget {
   final OpenMeteoApi? api;
+  final CityData? selectedCity;
 
-  const CurrentWeatherCard({super.key, this.api});
+  const CurrentWeatherCard({super.key, this.api, this.selectedCity});
 
   @override
   State<CurrentWeatherCard> createState() => CurrentWeatherCardState();
@@ -18,14 +20,48 @@ class CurrentWeatherCard extends StatefulWidget {
 
 /// State for [CurrentWeatherCard].
 class CurrentWeatherCardState extends State<CurrentWeatherCard> {
-  late final Future<ForecastData> forecastDataFuture;
+  late Future<ForecastData> forecastDataFuture;
+
+  double getLatitude() {
+    return widget.selectedCity?.latitude ?? OpenMeteoApi.defaultLatitude;
+  }
+
+  double getLongitude() {
+    return widget.selectedCity?.longitude ?? OpenMeteoApi.defaultLongitude;
+  }
 
   @override
   void initState() {
     super.initState();
     final today = DateUtils.dateOnly(DateTime.now());
     forecastDataFuture = (widget.api ?? OpenMeteoApi())
-        .fetchWeatherDataForRange(startDate: today, endDate: today);
+        .fetchWeatherDataForRange(
+          startDate: today,
+          endDate: today,
+          latitude: getLatitude(),
+          longitude: getLongitude(),
+        );
+  }
+
+  @override
+  void didUpdateWidget(covariant CurrentWeatherCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final locationHasChanged =
+        oldWidget.selectedCity?.latitude != widget.selectedCity?.latitude ||
+        oldWidget.selectedCity?.longitude != widget.selectedCity?.longitude;
+
+    if (locationHasChanged) {
+      final today = DateUtils.dateOnly(DateTime.now());
+
+      forecastDataFuture = (widget.api ?? OpenMeteoApi())
+          .fetchWeatherDataForRange(
+            startDate: today,
+            endDate: today,
+            latitude: getLatitude(),
+            longitude: getLongitude(),
+          );
+    }
   }
 
   /// Builds the card contents for the current [forecastDataFuture] snapshot.
@@ -108,10 +144,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                           ),
                         ),
                         Text(
-                          '${formattedDate[0].toUpperCase()}${formattedDate.substring(1).toLowerCase()}',
-                        ),
-                        Text(
-                          'Montpellier',
+                          widget.selectedCity?.name ?? 'Montpellier',
                           style: textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -160,7 +193,8 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                       children: [
                         WeatherInfoTile(
                           title: 'Ressenti'.toUpperCase(),
-                          information: '${currentWeather.apparentTemperature}°C',
+                          information:
+                              '${currentWeather.apparentTemperature}°C',
                           weatherIcon: Icons.thermostat,
                         ),
                         WeatherInfoTile(
