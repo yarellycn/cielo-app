@@ -22,9 +22,6 @@ class MyApp extends StatelessWidget {
       title: 'Cielo',
       theme: ThemeData(
         textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 55, 162, 216),
-        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),

@@ -11,4 +11,7 @@ class AppColors {
 
   static const forecastButtonBackground = Color.fromRGBO(230, 233, 235, 1);
   static const forecastButtonText = Color.fromRGBO(84, 96, 113, 1);
+
+  static const mainCardBackgroundPrimaryColor = Color.fromRGBO(41, 134, 247, 1);
+  static const mainCardBackgroundSecondaryColor = Color.fromRGBO(59, 177, 235, 1);
 }

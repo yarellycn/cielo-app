@@ -35,7 +35,6 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
   ) {
     Widget currentWeatherWidget;
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
 
     if (snapshot.connectionState == ConnectionState.waiting) {
       currentWeatherWidget = const CircularProgressIndicator();
@@ -63,7 +62,15 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
 
       currentWeatherWidget = Container(
         decoration: BoxDecoration(
-          color: colorScheme.primary,
+          // color: Colors.blueAccent,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.mainCardBackgroundPrimaryColor,
+              AppColors.mainCardBackgroundSecondaryColor,
+            ],
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(cardPadding),
