@@ -19,7 +19,7 @@ class OpenMeteoApi {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
-  /// Fetches the current weather data for the specified latitude and longitude.
+  /// Fetches the historical weather data for the specified latitude and longitude.
   Future<ForecastData> fetchHistoricalWeatherData({
     required DateTime startDate,
     required DateTime endDate,
@@ -74,6 +74,7 @@ class OpenMeteoApi {
     );
   }
 
+  /// Fetches the forecast weather data for the specified latitude and longitude.
   Future<ForecastData> fetchForecastWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
@@ -134,6 +135,7 @@ class OpenMeteoApi {
     );
   }
 
+  /// Fetches the weather data for the specified latitude and longitude using both historical and forecast requests.
   Future<ForecastData> fetchWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
