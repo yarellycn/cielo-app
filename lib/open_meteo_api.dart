@@ -39,7 +39,7 @@ class OpenMeteoApi {
           'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
       'start_date': apiDate(start),
       'end_date': apiDate(end),
-      'timezone': 'Europe/Paris',
+      'timezone': localTimezone,
     };
 
     final uri = Uri.https(archiveUrl, '/v1/archive', params);
@@ -67,6 +67,9 @@ class OpenMeteoApi {
     }
 
     return ForecastData(
+      timezone: json['timezone'] as String?,
+      timezoneAbbreviation: json['timezone_abbreviation'] as String?,
+      utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toInt(),
       hourlyWeatherData: _parseHourlyWeather(hourlyWeatherData),
       dailyWeatherData: _parseDailyWeather(dailyWeatherData),
     );
@@ -89,7 +92,7 @@ class OpenMeteoApi {
           'temperature_2m_min,temperature_2m_max,apparent_temperature_min,apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,precipitation_sum,cloud_cover_mean,weather_code',
       'start_date': apiDate(startDate),
       'end_date': apiDate(endDate),
-      'timezone': 'Europe/Paris',
+      'timezone': localTimezone,
     };
 
     /// Build the URI for the API request
@@ -123,6 +126,9 @@ class OpenMeteoApi {
     }
 
     return ForecastData(
+      timezone: json['timezone'] as String?,
+      timezoneAbbreviation: json['timezone_abbreviation'] as String?,
+      utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toInt(),
       currentWeatherData: CurrentWeather.fromJson(currentWeatherData),
       hourlyWeatherData: _parseHourlyWeather(hourlyWeatherData),
       dailyWeatherData: _parseDailyWeather(dailyWeatherData),
@@ -176,6 +182,12 @@ class OpenMeteoApi {
     );
 
     return ForecastData(
+      timezone: forecastData.timezone ?? historicalData.timezone,
+      timezoneAbbreviation:
+          forecastData.timezoneAbbreviation ??
+          historicalData.timezoneAbbreviation,
+      utcOffsetSeconds:
+          forecastData.utcOffsetSeconds ?? historicalData.utcOffsetSeconds,
       currentWeatherData: forecastData.currentWeatherData,
       hourlyWeatherData: [
         ...historicalData.hourlyWeatherData,

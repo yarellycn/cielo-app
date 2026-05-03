@@ -91,6 +91,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         'EEEE d MMMM y HH:mm',
         'fr_FR',
       ).format(currentWeather.time);
+      final timezoneAbbreviation = snapshot.data!.timezoneAbbreviation;
+      final formattedDateWithTimezone = timezoneAbbreviation == null
+          ? formattedDate
+          : '$formattedDate $timezoneAbbreviation';
+      final displayedDate =
+          '${formattedDateWithTimezone[0].toUpperCase()}${formattedDateWithTimezone.substring(1)}';
       const cardPadding = 35.0;
       const tileWidth = 135.0;
       const tileHeight = 55.0;
@@ -125,7 +131,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
               final rowCount = (5 / columnCount).ceil();
               final gridHeight =
                   (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
-        
+
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -143,6 +149,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                             color: AppColors.secondaryTextOnPrimary,
                           ),
                         ),
+                        Text(displayedDate),
                         Text(
                           widget.selectedCity?.name ?? 'Montpellier',
                           style: textTheme.headlineSmall?.copyWith(
