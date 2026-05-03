@@ -37,6 +37,7 @@ class DailyForecastCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
+      margin: EdgeInsets.zero,
       color: isItToday
           ? AppColors.highlightedItemBackground
           : Color.fromARGB(255, 255, 255, 255),

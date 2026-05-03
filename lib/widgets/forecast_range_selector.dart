@@ -35,6 +35,7 @@ class ForecastRangeSelector extends StatelessWidget {
 
     return Card(
       elevation: 2,
+      margin: EdgeInsets.zero,
       color: const Color.fromARGB(255, 255, 255, 255),
       child: DefaultTextStyle.merge(
         style: Theme.of(
