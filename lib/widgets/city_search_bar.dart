@@ -53,6 +53,7 @@ class CitySearchBarState extends State<CitySearchBar> {
                   return TextField(
                     controller: textEditingController,
                     focusNode: focusNode,
+                    onSubmitted: (_) => onFieldSubmitted(),
                     decoration: InputDecoration(
                       hintText: 'Rechercher une ville...',
                       prefixIcon: const Icon(Icons.search),
