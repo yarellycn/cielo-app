@@ -1,4 +1,5 @@
 import 'package:cielo_app/theme/app_colors.dart';
+import 'package:cielo_app/widgets/city_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -63,29 +64,7 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          Flexible(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500, maxHeight: 40),
-              child: Material(
-                elevation: 1,
-                borderRadius: BorderRadius.circular(12),
-                clipBehavior: .antiAlias,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Rechercher une ville...',
-                    prefixIcon: const Icon(Icons.search),
-                    hintStyle: TextStyle(color: AppColors.forecastButtonText),
-                    prefixIconColor: AppColors.forecastButtonText,
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          CitySearchBar(),
         ],
       ),
     );
