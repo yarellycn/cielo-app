@@ -27,7 +27,7 @@ class CitySearchBarState extends State<CitySearchBar> {
           borderRadius: BorderRadius.circular(12),
           clipBehavior: .antiAlias,
           child: Autocomplete<CityData>(
-            displayStringForOption: (city) => city.name,
+            displayStringForOption: (city) => '${city.name}, ${city.admin1}, ${city.country}',
             onSelected: (city) {
               widget.onCitySelected?.call(city);
             },
