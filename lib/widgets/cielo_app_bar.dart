@@ -32,30 +32,59 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       backgroundColor: AppColors.mainBackgroundColor,
+      // backgroundColor: Colors.orange,
       shape: const Border(
         bottom: BorderSide(color: AppColors.forecastButtonBackground),
       ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      title: Row(
+        spacing: 20,
         children: [
-          Image.asset(
-            'assets/logos/app_logo.png',
-            width: _logoWidth,
-            height: _logoHeight,
-            cacheWidth: (_logoWidth * devicePixelRatio).round(),
-            cacheHeight: (_logoHeight * devicePixelRatio).round(),
-            filterQuality: FilterQuality.high,
-            fit: BoxFit.contain,
-            isAntiAlias: true,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/logos/app_logo.png',
+                width: _logoWidth,
+                height: _logoHeight,
+                cacheWidth: (_logoWidth * devicePixelRatio).round(),
+                cacheHeight: (_logoHeight * devicePixelRatio).round(),
+                filterQuality: FilterQuality.high,
+                fit: BoxFit.contain,
+                isAntiAlias: true,
+              ),
+              Text(
+                'HISTORIQUE ET PRÉVISIONS MÉTÉO',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.logoColor,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          Text(
-            'HISTORIQUE ET PRÉVISIONS MÉTÉO',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.logoColor,
-              fontWeight: FontWeight.bold,
+          Flexible(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500, maxHeight: 40),
+              child: Material(
+                elevation: 1,
+                borderRadius: BorderRadius.circular(12),
+                clipBehavior: .antiAlias,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Rechercher une ville...',
+                    prefixIcon: const Icon(Icons.search),
+                    hintStyle: TextStyle(color: AppColors.forecastButtonText),
+                    prefixIconColor: AppColors.forecastButtonText,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
