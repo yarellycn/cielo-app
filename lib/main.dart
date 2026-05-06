@@ -48,11 +48,13 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     const double widgetWidth = 1250.00;
-    const double homePadding = 20;
+    const double homePadding = 20.00;
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
       appBar: CieloAppBar(
+        maxContentWidth: widgetWidth,
+        padding: homePadding,
         onCitySelected: (city) {
           setState(() {
             selectedCity = city;

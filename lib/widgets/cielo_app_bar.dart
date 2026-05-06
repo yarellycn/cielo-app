@@ -5,8 +5,15 @@ import 'package:flutter/material.dart';
 
 class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<CityData>? onCitySelected;
+  final double maxContentWidth;
+  final double padding;
 
-  const CieloAppBar({super.key, this.onCitySelected});
+  const CieloAppBar({
+    super.key,
+    required this.maxContentWidth,
+    required this.padding,
+    this.onCitySelected,
+  });
   static const appBarHeight = 75.00;
   static const _iconSize = 40.00;
   static const _logoWidth = 85.00;
@@ -21,54 +28,64 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       toolbarHeight: appBarHeight,
-      leadingWidth: 60,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 20.00),
-        child: Image.asset(
-          'assets/icons/app_icon.png',
-          width: _iconSize,
-          height: _iconSize,
-          cacheWidth: (_iconSize * devicePixelRatio).round(),
-          cacheHeight: (_iconSize * devicePixelRatio).round(),
-          filterQuality: FilterQuality.high,
-          fit: BoxFit.contain,
-          isAntiAlias: true,
-        ),
-      ),
+      automaticallyImplyLeading: false,
+      titleSpacing: 0,
       backgroundColor: AppColors.mainBackgroundColor,
       // backgroundColor: Colors.orange,
       shape: const Border(
         bottom: BorderSide(color: AppColors.forecastButtonBackground),
       ),
-      title: Row(
-        spacing: 20,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/logos/app_logo.png',
-                width: _logoWidth,
-                height: _logoHeight,
-                cacheWidth: (_logoWidth * devicePixelRatio).round(),
-                cacheHeight: (_logoHeight * devicePixelRatio).round(),
-                filterQuality: FilterQuality.high,
-                fit: BoxFit.contain,
-                isAntiAlias: true,
-              ),
-              Text(
-                'HISTORIQUE ET PRÉVISIONS MÉTÉO',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.logoColor,
-                  fontWeight: FontWeight.bold,
+      title: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxContentWidth),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: Row(
+              spacing: 20,
+              children: [
+                Image.asset(
+                  'assets/icons/app_icon.png',
+                  width: _iconSize,
+                  height: _iconSize,
+                  cacheWidth: (_iconSize * devicePixelRatio).round(),
+                  cacheHeight: (_iconSize * devicePixelRatio).round(),
+                  filterQuality: FilterQuality.high,
+                  fit: BoxFit.contain,
+                  isAntiAlias: true,
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                Material(
+                  // color: Colors.amber,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/logos/app_logo.png',
+                        width: _logoWidth,
+                        height: _logoHeight,
+                        cacheWidth: (_logoWidth * devicePixelRatio).round(),
+                        cacheHeight: (_logoHeight * devicePixelRatio).round(),
+                        filterQuality: FilterQuality.high,
+                        fit: BoxFit.contain,
+                        isAntiAlias: true,
+                      ),
+                      Text(
+                        'HISTORIQUE ET PRÉVISIONS MÉTÉO',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.logoColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+
+                CitySearchBar(onCitySelected: onCitySelected),
+              ],
+            ),
           ),
-          CitySearchBar(onCitySelected: onCitySelected),
-        ],
+        ),
       ),
     );
   }
