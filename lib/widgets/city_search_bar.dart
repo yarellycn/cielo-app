@@ -16,92 +16,129 @@ class CitySearchBar extends StatefulWidget {
 class CitySearchBarState extends State<CitySearchBar> {
   static const searchDebounceDelay = Duration(milliseconds: 200);
   static const minimumSearchLength = 2;
+  final double searchBarMaxWidth = 500;
+  final double borderRadius = 12;
+  bool isSearchFocused = false;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final seachFieldTextColor = AppColors.forecastButtonText;
+    final searchFieldTextStyle = textTheme.bodyMedium?.copyWith(
+      color: seachFieldTextColor,
+    );
+
     return Flexible(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 40),
-        child: Material(
-          elevation: 1,
-          borderRadius: BorderRadius.circular(12),
-          clipBehavior: .antiAlias,
-          child: Autocomplete<CityData>(
-            displayStringForOption: (city) =>
-                '${city.name}, ${city.admin1}, ${city.country}',
-            optionsViewBuilder: (context, onSelected, options) {
-              return Align(
-                alignment: Alignment.topLeft,
-                child: Material(
-                  elevation: 4,
-                  borderRadius: BorderRadius.circular(12),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 500,
-                      maxHeight: 260,
-                    ),
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: options.length,
-                      itemBuilder: (context, index) {
-                        final city = options.elementAt(index);
+        constraints: BoxConstraints(maxWidth: searchBarMaxWidth, maxHeight: 40),
+        child: Focus(
+          onFocusChange: (hasFocus) {
+            setState(() {
+              isSearchFocused = hasFocus;
+            });
+          },
+          child: Material(
+            elevation: isSearchFocused ? 0 : 1,
+            borderRadius: BorderRadius.circular(borderRadius),
+            clipBehavior: .antiAlias,
+            child: Autocomplete<CityData>(
+              displayStringForOption: (city) =>
+                  '${city.name}, ${city.admin1}, ${city.country}',
+              optionsViewBuilder: (context, onSelected, options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: searchBarMaxWidth,
+                        maxHeight: 260,
+                      ),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final city = options.elementAt(index);
 
-                        return ListTile(
-                          leading: const Icon(
-                            Icons.pin_drop,
-                            color: Colors.blue,
-                          ),
-                          title: Text(
-                            city.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text('${city.admin1}, ${city.country}'),
-                          onTap: () => onSelected(city),
-                        );
-                      },
+                          return ListTile(
+                            leading: const Icon(
+                              Icons.pin_drop,
+                              color: Colors.blue,
+                            ),
+                            title: Text(
+                              city.name,
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '${city.admin1}, ${city.country}',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: seachFieldTextColor,
+                              ),
+                            ),
+                            onTap: () => onSelected(city),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-            onSelected: (city) {
-              widget.onCitySelected?.call(city);
-            },
-            optionsBuilder: (TextEditingValue textEditingValue) async {
-              final query = textEditingValue.text.trim();
-
-              if (query.length < minimumSearchLength) {
-                return const Iterable<CityData>.empty();
-              }
-
-              await Future<void>.delayed(searchDebounceDelay);
-
-              try {
-                return await (widget.api ?? GeocodingApi()).fetchCitiesData(
-                  cityNameOrCode: query,
                 );
-              } catch (_) {
-                return const Iterable<CityData>.empty();
-              }
-            },
-            fieldViewBuilder:
-                (context, textEditingController, focusNode, onFieldSubmitted) {
-                  return TextField(
-                    controller: textEditingController,
-                    focusNode: focusNode,
-                    onSubmitted: (_) => onFieldSubmitted(),
-                    decoration: InputDecoration(
-                      hintText: 'Rechercher une ville...',
-                      prefixIcon: const Icon(Icons.search),
-                      hintStyle: TextStyle(color: AppColors.forecastButtonText),
-                      prefixIconColor: AppColors.forecastButtonText,
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
-                    ),
+              },
+              onSelected: (city) {
+                widget.onCitySelected?.call(city);
+              },
+              optionsBuilder: (TextEditingValue textEditingValue) async {
+                final query = textEditingValue.text.trim();
+
+                if (query.length < minimumSearchLength) {
+                  return const Iterable<CityData>.empty();
+                }
+
+                await Future<void>.delayed(searchDebounceDelay);
+
+                try {
+                  return await (widget.api ?? GeocodingApi()).fetchCitiesData(
+                    cityNameOrCode: query,
                   );
-                },
+                } catch (_) {
+                  return const Iterable<CityData>.empty();
+                }
+              },
+              fieldViewBuilder:
+                  (
+                    context,
+                    textEditingController,
+                    focusNode,
+                    onFieldSubmitted,
+                  ) {
+                    return TextField(
+                      controller: textEditingController,
+                      focusNode: focusNode,
+                      onSubmitted: (_) => onFieldSubmitted(),
+                      style: searchFieldTextStyle,
+
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher une ville...',
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        hintStyle: searchFieldTextStyle,
+                        prefixIconColor: AppColors.forecastButtonText,
+                        filled: true,
+                        fillColor: Colors.white,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: AppColors.highlightedItemBorder,
+                          ),
+                          borderRadius: BorderRadius.circular(borderRadius),
+                        ),
+                      ),
+                    );
+                  },
+            ),
           ),
         ),
       ),
