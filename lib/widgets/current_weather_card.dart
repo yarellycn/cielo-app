@@ -106,6 +106,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
       const tileWidth = 135.0;
       const tileHeight = 55.0;
       const tileSpacing = 12.0;
+      const weatherIconSize = 64.0;
 
       currentWeatherWidget = Card(
         elevation: 5,
@@ -136,6 +137,9 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
               final rowCount = (5 / columnCount).ceil();
               final gridHeight =
                   (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
+              final weatherCode = WeatherCode.fromCode(
+                currentWeather.weatherCode,
+              );
 
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -163,8 +167,16 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
+                          spacing: 2,
                           children: [
-                            // Icon(Icons.sunny, color: colorScheme.onPrimary),
+                            if (weatherCode != null)
+                              Image.asset(
+                                weatherCode.iconAsset,
+                                width: weatherIconSize,
+                                fit: BoxFit.contain,
+                                filterQuality: FilterQuality.high,
+                                isAntiAlias: true,
+                              ),
                             const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: .start,
@@ -174,9 +186,7 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
                                   style: textTheme.displayLarge,
                                 ),
                                 Text(
-                                  WeatherCode.fromCode(
-                                        currentWeather.weatherCode,
-                                      )?.description ??
+                                  weatherCode?.description ??
                                       'Unknown currentWeather',
                                   style: const TextStyle(
                                     color: AppColors.secondaryTextOnPrimary,
