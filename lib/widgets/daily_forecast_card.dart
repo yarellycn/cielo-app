@@ -34,9 +34,10 @@ class DailyForecastCard extends StatelessWidget {
       color: Colors.black,
       fontWeight: FontWeight.bold,
     );
+    final weatherCode = WeatherCode.fromCode(dailyWeatherData.weatherCode);
 
     return Card(
-      elevation: 2,
+      elevation: isItToday ? 0 : 2,
       margin: EdgeInsets.zero,
       color: isItToday
           ? AppColors.highlightedItemBackground
@@ -64,6 +65,7 @@ class DailyForecastCard extends StatelessWidget {
               crossAxisAlignment: .start,
               children: [
                 Row(
+                  mainAxisAlignment: .spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: .start,
@@ -82,15 +84,21 @@ class DailyForecastCard extends StatelessWidget {
                         Text(dateMonth),
                       ],
                     ),
-                    Row(),
+                    Row(
+                      children: [
+                        if (weatherCode != null)
+                          Image.asset(
+                            weatherCode.iconAsset,
+                            width: 26,
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.high,
+                            isAntiAlias: true,
+                          ),
+                      ],
+                    ),
                   ],
                 ),
-                Text(
-                  WeatherCode.fromCode(
-                        dailyWeatherData.weatherCode,
-                      )?.description ??
-                      'Unknown weather',
-                ),
+                Text(weatherCode?.description ?? 'Unknown weather'),
                 Column(
                   spacing: 6.50,
                   children: [
