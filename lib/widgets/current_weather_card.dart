@@ -1,18 +1,22 @@
 import 'package:cielo_app/models/city_data.dart';
-import 'package:cielo_app/models/forecast_data.dart';
+import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/weather_code.dart';
-import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/weather_info_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-/// A widget that displays the current weather data fetched from the Open-Meteo API.
 class CurrentWeatherCard extends StatefulWidget {
-  final OpenMeteoApi? api;
   final CityData? selectedCity;
+  final CurrentWeather? currentWeatherData;
+  final String? timeZoneAbbreviation;
 
-  const CurrentWeatherCard({super.key, this.api, this.selectedCity});
+  const CurrentWeatherCard({
+    super.key,
+    this.selectedCity,
+    this.currentWeatherData,
+    this.timeZoneAbbreviation,
+  });
 
   @override
   State<CurrentWeatherCard> createState() => CurrentWeatherCardState();
@@ -20,237 +24,173 @@ class CurrentWeatherCard extends StatefulWidget {
 
 /// State for [CurrentWeatherCard].
 class CurrentWeatherCardState extends State<CurrentWeatherCard> {
-  late Future<ForecastData> forecastDataFuture;
-
-  double getLatitude() {
-    return widget.selectedCity?.latitude ?? OpenMeteoApi.defaultLatitude;
-  }
-
-  double getLongitude() {
-    return widget.selectedCity?.longitude ?? OpenMeteoApi.defaultLongitude;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final today = DateUtils.dateOnly(DateTime.now());
-    forecastDataFuture = (widget.api ?? OpenMeteoApi())
-        .fetchWeatherDataForRange(
-          startDate: today,
-          endDate: today,
-          latitude: getLatitude(),
-          longitude: getLongitude(),
-        );
-  }
-
-  @override
-  void didUpdateWidget(covariant CurrentWeatherCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final locationHasChanged =
-        oldWidget.selectedCity?.latitude != widget.selectedCity?.latitude ||
-        oldWidget.selectedCity?.longitude != widget.selectedCity?.longitude;
-
-    if (locationHasChanged) {
-      final today = DateUtils.dateOnly(DateTime.now());
-
-      forecastDataFuture = (widget.api ?? OpenMeteoApi())
-          .fetchWeatherDataForRange(
-            startDate: today,
-            endDate: today,
-            latitude: getLatitude(),
-            longitude: getLongitude(),
-          );
-    }
-  }
-
-  /// Builds the card contents for the current [forecastDataFuture] snapshot.
-  Widget buildCurrentWeatherWidget(
-    BuildContext context,
-    AsyncSnapshot<ForecastData> snapshot,
-  ) {
+  Widget buildCurrentWeatherWidget(BuildContext context) {
     Widget currentWeatherWidget;
     final textTheme = Theme.of(context).textTheme;
+    final currentWeather = widget.currentWeatherData;
 
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      currentWeatherWidget = const Center(
-        child: SizedBox.square(
-          dimension: 32,
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else if (snapshot.hasError) {
-      currentWeatherWidget = Text(
-        'Unable to load weather data: ${snapshot.error}',
-        style: textTheme.headlineSmall,
-        textAlign: TextAlign.center,
-      );
-    } else if (snapshot.hasData) {
-      final currentWeather = snapshot.data!.currentWeatherData;
-      if (currentWeather == null) {
-        currentWeatherWidget = const Text('No current weather available');
-        return currentWeatherWidget;
-      }
-
-      final formattedDate = DateFormat(
-        'EEEE d MMMM y HH:mm',
-        'fr_FR',
-      ).format(currentWeather.time);
-      final timezoneAbbreviation = snapshot.data!.timezoneAbbreviation;
-      final formattedDateWithTimezone = timezoneAbbreviation == null
-          ? formattedDate
-          : '$formattedDate $timezoneAbbreviation';
-      final displayedDate =
-          '${formattedDateWithTimezone[0].toUpperCase()}${formattedDateWithTimezone.substring(1)}';
-      const cardPadding = 35.0;
-      const tileWidth = 135.0;
-      const tileHeight = 55.0;
-      const tileSpacing = 12.0;
-      const weatherIconSize = 64.0;
-
-      currentWeatherWidget = Card(
-        elevation: 5,
-        margin: EdgeInsets.zero,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.mainCardBackgroundPrimaryColor,
-                AppColors.mainCardBackgroundSecondaryColor,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(cardPadding),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final availableWidth = constraints.maxWidth;
-              final leftColumnWidth = availableWidth * 0.50;
-              final maxGridWidth = (tileWidth * 2) + tileSpacing;
-              final availableGridWidth = availableWidth - leftColumnWidth;
-              final gridWidth = (availableGridWidth >= maxGridWidth)
-                  ? maxGridWidth
-                  : tileWidth;
-              final columnCount = gridWidth >= maxGridWidth ? 2 : 1;
-              final rowCount = (5 / columnCount).ceil();
-              final gridHeight =
-                  (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
-              final weatherCode = WeatherCode.fromCode(
-                currentWeather.weatherCode,
-              );
-
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: leftColumnWidth,
-                    child: Column(
-                      spacing: 4,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: .start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Météo Actuelle'.toUpperCase(),
-                          style: const TextStyle(
-                            color: AppColors.secondaryTextOnPrimary,
-                          ),
-                        ),
-                        Text(displayedDate),
-                        Text(
-                          widget.selectedCity?.name ?? 'Montpellier',
-                          style: textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 2,
-                          children: [
-                            if (weatherCode != null)
-                              Image.asset(
-                                weatherCode.iconAsset,
-                                width: weatherIconSize,
-                                fit: BoxFit.contain,
-                                filterQuality: FilterQuality.high,
-                                isAntiAlias: true,
-                              ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: .start,
-                              children: [
-                                Text(
-                                  '${currentWeather.temperature}°C',
-                                  style: textTheme.displayLarge,
-                                ),
-                                Text(
-                                  weatherCode?.description ??
-                                      'Unknown currentWeather',
-                                  style: const TextStyle(
-                                    color: AppColors.secondaryTextOnPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: gridWidth,
-                    height: gridHeight,
-                    child: GridView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: columnCount,
-                        mainAxisExtent: tileHeight,
-                        mainAxisSpacing: tileSpacing,
-                        crossAxisSpacing: tileSpacing,
-                      ),
-                      children: [
-                        WeatherInfoTile(
-                          title: 'Ressenti'.toUpperCase(),
-                          information:
-                              '${currentWeather.apparentTemperature}°C',
-                          weatherIcon: Icons.thermostat,
-                        ),
-                        WeatherInfoTile(
-                          title: 'Humidité'.toUpperCase(),
-                          information: '${currentWeather.relativeHumidity}%',
-                          weatherIcon: Icons.water_drop_outlined,
-                        ),
-                        WeatherInfoTile(
-                          title: 'Vent'.toUpperCase(),
-                          information: '${currentWeather.windSpeed} km/h',
-                          weatherIcon: Icons.air,
-                        ),
-                        WeatherInfoTile(
-                          title: 'Précipitations'.toUpperCase(),
-                          information: '${currentWeather.precipitation} mm',
-                          weatherIcon: Icons.cloudy_snowing,
-                        ),
-                        WeatherInfoTile(
-                          title: 'Nuages'.toUpperCase(),
-                          information: '${currentWeather.cloudCover}%',
-                          weatherIcon: Icons.cloud_queue,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      );
-    } else {
-      currentWeatherWidget = const Text('No data available');
+    if (currentWeather == null) {
+      return const Text('No current weather available');
     }
+
+    final formattedDate = DateFormat(
+      'EEEE d MMMM y HH:mm',
+      'fr_FR',
+    ).format(currentWeather.time);
+    final timezoneAbbreviation = widget.timeZoneAbbreviation;
+    final formattedDateWithTimezone = timezoneAbbreviation == null
+        ? formattedDate
+        : '$formattedDate $timezoneAbbreviation';
+    final displayedDate =
+        '${formattedDateWithTimezone[0].toUpperCase()}${formattedDateWithTimezone.substring(1)}';
+    const cardPadding = 35.0;
+    const tileWidth = 135.0;
+    const tileHeight = 55.0;
+    const tileSpacing = 12.0;
+    const weatherIconSize = 64.0;
+
+    currentWeatherWidget = Card(
+      elevation: 5,
+      margin: EdgeInsets.zero,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.mainCardBackgroundPrimaryColor,
+              AppColors.mainCardBackgroundSecondaryColor,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.all(cardPadding),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableWidth = constraints.maxWidth;
+            final leftColumnWidth = availableWidth * 0.50;
+            final maxGridWidth = (tileWidth * 2) + tileSpacing;
+            final availableGridWidth = availableWidth - leftColumnWidth;
+            final gridWidth = (availableGridWidth >= maxGridWidth)
+                ? maxGridWidth
+                : tileWidth;
+            final columnCount = gridWidth >= maxGridWidth ? 2 : 1;
+            final rowCount = (5 / columnCount).ceil();
+            final gridHeight =
+                (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
+            final weatherCode = WeatherCode.fromCode(
+              currentWeather.weatherCode,
+            );
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: leftColumnWidth,
+                  child: Column(
+                    spacing: 4,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: .start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Météo Actuelle'.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.secondaryTextOnPrimary,
+                        ),
+                      ),
+                      Text(displayedDate),
+                      Text(
+                        widget.selectedCity?.name ?? 'Montpellier',
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        spacing: 2,
+                        children: [
+                          if (weatherCode != null)
+                            Image.asset(
+                              weatherCode.iconAsset,
+                              width: weatherIconSize,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                              isAntiAlias: true,
+                            ),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(
+                                '${currentWeather.temperature}°C',
+                                style: textTheme.displayLarge?.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                weatherCode?.description ??
+                                    'Unknown currentWeather',
+                                style: const TextStyle(
+                                  color: AppColors.secondaryTextOnPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: gridWidth,
+                  height: gridHeight,
+                  child: GridView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columnCount,
+                      mainAxisExtent: tileHeight,
+                      mainAxisSpacing: tileSpacing,
+                      crossAxisSpacing: tileSpacing,
+                    ),
+                    children: [
+                      WeatherInfoTile(
+                        title: 'Ressenti'.toUpperCase(),
+                        information: '${currentWeather.apparentTemperature}°C',
+                        weatherIcon: Icons.thermostat,
+                      ),
+                      WeatherInfoTile(
+                        title: 'Humidité'.toUpperCase(),
+                        information: '${currentWeather.relativeHumidity}%',
+                        weatherIcon: Icons.water_drop_outlined,
+                      ),
+                      WeatherInfoTile(
+                        title: 'Vent'.toUpperCase(),
+                        information: '${currentWeather.windSpeed} km/h',
+                        weatherIcon: Icons.air,
+                      ),
+                      WeatherInfoTile(
+                        title: 'Précipitations'.toUpperCase(),
+                        information: '${currentWeather.precipitation} mm',
+                        weatherIcon: Icons.cloudy_snowing,
+                      ),
+                      WeatherInfoTile(
+                        title: 'Nuages'.toUpperCase(),
+                        information: '${currentWeather.cloudCover}%',
+                        weatherIcon: Icons.cloud_queue,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
 
     return currentWeatherWidget;
   }
@@ -270,12 +210,10 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
         style: theme.textTheme.bodySmall!.copyWith(
           color: theme.colorScheme.onPrimary,
         ),
-        child: FutureBuilder<ForecastData>(
-          future: forecastDataFuture,
-          builder: buildCurrentWeatherWidget,
-        ),
+        child: buildCurrentWeatherWidget(context),
       ),
     );
+    // return buildCurrentWeatherWidget(context);
     // );
   }
 }

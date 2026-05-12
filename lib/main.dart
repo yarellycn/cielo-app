@@ -1,5 +1,7 @@
 import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/forecast_data.dart';
 import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
@@ -45,10 +47,176 @@ class MyHomePageState extends State<MyHomePage> {
   DateTimeRange? selectedCustomRange;
   CityData? selectedCity;
 
+  late Future<ForecastData> presetForecastDataFuture;
+  late Future<ForecastData> forecastDataFuture;
+  ForecastData? presetForecastData;
+  bool isShowingCustomForecastData = false;
+
+  double getLatitude() {
+    return selectedCity?.latitude ?? OpenMeteoApi.defaultLatitude;
+  }
+
+  double getLongitude() {
+    return selectedCity?.longitude ?? OpenMeteoApi.defaultLongitude;
+  }
+
+  Future<ForecastData> fetchDefaultForecastData() {
+    final today = DateUtils.dateOnly(DateTime.now());
+
+    return OpenMeteoApi()
+        .fetchWeatherDataForRange(
+          startDate: today.subtract(const Duration(days: 3)),
+          endDate: today.add(const Duration(days: 7)),
+          latitude: getLatitude(),
+          longitude: getLongitude(),
+        )
+        .then((forecastData) {
+          presetForecastData = forecastData;
+          return forecastData;
+        });
+  }
+
+  Future<ForecastData> fetchCustomRangeForecastData(DateTimeRange range) {
+    return OpenMeteoApi().fetchWeatherDataForRange(
+      startDate: range.start,
+      endDate: range.end,
+      latitude: getLatitude(),
+      longitude: getLongitude(),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    presetForecastDataFuture = fetchDefaultForecastData();
+    forecastDataFuture = presetForecastDataFuture;
+  }
+
+  Widget getCurrentWeatherCard(BuildContext context, TextTheme textTheme) {
+    return FutureBuilder<ForecastData>(
+      future: presetForecastDataFuture,
+      initialData: presetForecastData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: SizedBox.square(
+              dimension: 32,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Text(
+            'Unable to load weather data: ${snapshot.error}',
+            style: textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return const Text('No data available');
+        }
+
+        final forecastData = snapshot.data!;
+
+        return CurrentWeatherCard(
+          selectedCity: selectedCity,
+          currentWeatherData: forecastData.currentWeatherData,
+          timeZoneAbbreviation: forecastData.timezoneAbbreviation,
+        );
+      },
+    );
+  }
+
+  Widget getForecastRangeSelector() {
+    return ForecastRangeSelector(
+      selectedRange: selectedRange,
+      selectedCustomRange: selectedCustomRange,
+      onRangeSelected: (range) {
+        setState(() {
+          selectedRange = range;
+
+          if (range != ForecastRange.custom) {
+            selectedCustomRange = null;
+
+            if (isShowingCustomForecastData) {
+              isShowingCustomForecastData = false;
+              forecastDataFuture = presetForecastDataFuture;
+            }
+          }
+        });
+      },
+      onCustomSelectedRange: (range) {
+        setState(() {
+          selectedRange = ForecastRange.custom;
+          selectedCustomRange = range;
+          isShowingCustomForecastData = true;
+          forecastDataFuture = fetchCustomRangeForecastData(range);
+        });
+      },
+    );
+  }
+
+  Widget getDailyWeatherList(
+    BuildContext context,
+    TextTheme textTheme,
+    double dailyWeatherListWidth,
+  ) {
+    return Column(
+      crossAxisAlignment: .start,
+      spacing: 20,
+      children: [
+        Text(
+          'Prévisons journalières',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        FutureBuilder<ForecastData>(
+          future: forecastDataFuture,
+          initialData: isShowingCustomForecastData ? null : presetForecastData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: SizedBox.square(
+                  dimension: 32,
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Text(
+                'Unable to load weather data: ${snapshot.error}',
+                style: textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return const Text('No data available');
+            }
+
+            final forecastData = snapshot.data!;
+
+            return DailyForecastList(
+              dailyWeatherData: forecastData.dailyWeatherData,
+              selectedRange: selectedRange,
+              selectedCustomRange: selectedCustomRange,
+              widgetWidth: dailyWeatherListWidth,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const double widgetWidth = 1250.00;
     const double homePadding = 20.00;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
@@ -58,6 +226,20 @@ class MyHomePageState extends State<MyHomePage> {
         onCitySelected: (city) {
           setState(() {
             selectedCity = city;
+            presetForecastData = null;
+
+            if (selectedRange == ForecastRange.custom &&
+                selectedCustomRange != null) {
+              isShowingCustomForecastData = true;
+              forecastDataFuture = fetchCustomRangeForecastData(
+                selectedCustomRange!,
+              );
+              presetForecastDataFuture = fetchDefaultForecastData();
+            } else {
+              isShowingCustomForecastData = false;
+              presetForecastDataFuture = fetchDefaultForecastData();
+              forecastDataFuture = presetForecastDataFuture;
+            }
           });
         },
       ),
@@ -74,32 +256,12 @@ class MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(homePadding),
                 children:
                     [
-                          CurrentWeatherCard(selectedCity: selectedCity),
-                          ForecastRangeSelector(
-                            selectedRange: selectedRange,
-                            selectedCustomRange: selectedCustomRange,
-                            onRangeSelected: (range) {
-                              setState(() {
-                                selectedRange = range;
-                              });
-                            },
-                            onCustomSelectedRange: (range) {
-                              setState(() {
-                                selectedRange = ForecastRange.custom;
-                                selectedCustomRange = range;
-                              });
-                            },
-                          ),
-                          Text(
-                            'Prévisons journalières',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          DailyForecastList(
-                            selectedRange: selectedRange,
-                            selectedCustomRange: selectedCustomRange,
-                            widgetWidth: widgetWidth - homePadding * 2,
-                            selectedCity: selectedCity,
+                          getCurrentWeatherCard(context, textTheme),
+                          getForecastRangeSelector(),
+                          getDailyWeatherList(
+                            context,
+                            textTheme,
+                            widgetWidth - homePadding * 2,
                           ),
                         ]
                         .expand(
