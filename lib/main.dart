@@ -159,20 +159,11 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget getHourlyForecastCard(
-    BuildContext context,
-    TextTheme textTheme,
-  ) {
+  Widget getHourlyForecastCard(BuildContext context, TextTheme textTheme) {
     return Column(
       crossAxisAlignment: .start,
       spacing: 20,
       children: [
-        Text(
-          'Prévisons journalières',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
         FutureBuilder<ForecastData>(
           future: forecastDataFuture,
           // initialData: presetForecastData,
