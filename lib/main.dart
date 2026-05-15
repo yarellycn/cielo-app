@@ -7,6 +7,7 @@ import 'package:cielo_app/widgets/cielo_app_bar.dart';
 import 'package:cielo_app/widgets/current_weather_card.dart';
 import 'package:cielo_app/widgets/daily_forecast_list.dart';
 import 'package:cielo_app/widgets/forecast_range_selector.dart';
+import 'package:cielo_app/widgets/hourly_forecast_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -95,7 +96,7 @@ class MyHomePageState extends State<MyHomePage> {
   Widget getCurrentWeatherCard(BuildContext context, TextTheme textTheme) {
     return FutureBuilder<ForecastData>(
       future: presetForecastDataFuture,
-      initialData: presetForecastData,
+      // initialData: presetForecastData,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -158,6 +159,59 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget getHourlyForecastCard(
+    BuildContext context,
+    TextTheme textTheme,
+  ) {
+    return Column(
+      crossAxisAlignment: .start,
+      spacing: 20,
+      children: [
+        Text(
+          'Prévisons journalières',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        FutureBuilder<ForecastData>(
+          future: forecastDataFuture,
+          // initialData: presetForecastData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: SizedBox.square(
+                  dimension: 32,
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Text(
+                'Unable to load weather data: ${snapshot.error}',
+                style: textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return const Text('No data available');
+            }
+
+            final forecastData = snapshot.data!;
+
+            return HourlyForecastCard(
+              selectedRange: selectedRange,
+              selectedCustomRange: selectedCustomRange,
+              selectedCity: selectedCity,
+              hourlyWeatherData: forecastData.hourlyWeatherData,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Widget getDailyWeatherList(
     BuildContext context,
     TextTheme textTheme,
@@ -175,7 +229,7 @@ class MyHomePageState extends State<MyHomePage> {
         ),
         FutureBuilder<ForecastData>(
           future: forecastDataFuture,
-          initialData: isShowingCustomForecastData ? null : presetForecastData,
+          // initialData: presetForecastData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -258,6 +312,7 @@ class MyHomePageState extends State<MyHomePage> {
                     [
                           getCurrentWeatherCard(context, textTheme),
                           getForecastRangeSelector(),
+                          getHourlyForecastCard(context, textTheme),
                           getDailyWeatherList(
                             context,
                             textTheme,
