@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:cielo_app/models/hourly_weather.dart';
+import 'package:cielo_app/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HourlyLineChart extends StatefulWidget {
   final List<HourlyWeather>? hourlyWeatherData;
@@ -14,36 +18,125 @@ class HourlyLineChart extends StatefulWidget {
 class HourlyLineChartState extends State<HourlyLineChart> {
   @override
   Widget build(BuildContext context) {
-    return LineChart(mainData());
+    if (widget.hourlyWeatherData == null || widget.hourlyWeatherData!.isEmpty) {
+      return Center(child: Text('Hourly weather data is not available.'));
+    }
+    return LineChart(mainData(widget.hourlyWeatherData));
   }
 }
 
-Widget bottomTitleWidgets(double value, TitleMeta meta) {
-  String text = switch (value.toInt()) {
-    2 => 'MAR',
-    5 => 'JUN',
-    8 => 'SEP',
-    _ => '',
-  };
-  return SideTitleWidget(meta: meta, child: Text(text));
+Widget bottomTitleWidgets(
+  double value,
+  TitleMeta meta,
+  List<HourlyWeather> todayHourlyData,
+) {
+  final index = value.toInt();
+  if (index < 0 || index >= todayHourlyData.length) {
+    return const SizedBox.shrink();
+  }
+
+  final dateTime = todayHourlyData[index].time;
+  final formattedDate = DateFormat('dd/MM').format(dateTime);
+  final formattedTime = DateFormat('HH:mm').format(dateTime);
+
+  final label = '$formattedDate\n$formattedTime';
+
+  return SideTitleWidget(
+    meta: meta,
+    child: Text(
+      label,
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 9,
+        color: AppColors.forecastButtonText,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  );
 }
 
 Widget leftTitleWidgets(double value, TitleMeta meta) {
-  String text = switch (value.toInt()) {
-    0 => '0°C',
-    7 => '7°C',
-    14 => '14°C',
-    21 => '21°C',
-    28 => '28°C',
-    _ => '',
-  };
-
-  return Text(text);
+  return SideTitleWidget(
+    meta: meta,
+    child: Text(
+      '${value.round()}°C',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 9,
+        color: AppColors.forecastButtonText,
+      ),
+      textAlign: TextAlign.right,
+    ),
+  );
 }
 
-LineChartData mainData() {
+List<FlSpot> spots(List<HourlyWeather> todayHourlyData) {
+  return List.generate(todayHourlyData.length, (index) {
+    final hourlyData = todayHourlyData[index];
+
+    return FlSpot(index.toDouble(), hourlyData.temperature.toDouble());
+  });
+}
+
+List<LineTooltipItem?> tooltipItems(
+  List<LineBarSpot> touchedSpots,
+  List<HourlyWeather> todayHourlyData,
+) {
+  return touchedSpots.map((touchedSpot) {
+    final index = touchedSpot.x.toInt();
+    if (index < 0 || index >= todayHourlyData.length) {
+      return null;
+    }
+    final hourlyData = todayHourlyData[index];
+    final dateTime = hourlyData.time;
+    final formattedDate = DateFormat('EEEE d MMMM', 'fr').format(dateTime);
+    final formattedTime = DateFormat('HH:mm', 'fr').format(dateTime);
+    final temperature = hourlyData.temperature;
+
+    return LineTooltipItem(
+      '$formattedDate, $formattedTime\nTempérature: $temperature°C',
+      TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+    );
+  }).toList();
+}
+
+LineChartData mainData(List<HourlyWeather>? hourlyWeatherData) {
+  final today = DateUtils.dateOnly(DateTime.now());
+
+  final todayHourlyData = hourlyWeatherData!.where((hourly) {
+    final hourlyDate = DateUtils.dateOnly(hourly.time);
+    return hourlyDate == today;
+  }).toList();
+
+  final temperatures = todayHourlyData.map((hourly) => hourly.temperature);
+
+  final minTemperature = temperatures.reduce((a, b) => a < b ? a : b);
+  final maxTemperature = temperatures.reduce((a, b) => a > b ? a : b);
+  log('Min temperature: $minTemperature');
+  log('Max temperature: $maxTemperature');
+
+  final defaultMinY = 0;
+  final defaultMaxY = 30;
+  final leftTitlesInterval = 10;
+
+  final chartMinY = minTemperature < defaultMinY
+      ? (minTemperature / leftTitlesInterval).floor() * leftTitlesInterval
+      : defaultMinY;
+
+  final chartMaxY = maxTemperature > defaultMaxY
+      ? (maxTemperature / leftTitlesInterval).ceil() * leftTitlesInterval
+      : defaultMaxY;
+
+  log('chartMinY: $chartMinY');
+  log('chartMaxY: $chartMaxY');
+
+  final hourCount = todayHourlyData.length;
+
   return LineChartData(
-    gridData: FlGridData(show: true),
+    gridData: FlGridData(
+      show: true,
+      horizontalInterval: leftTitlesInterval.toDouble(),
+    ),
     titlesData: FlTitlesData(
       show: true,
       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -51,39 +144,39 @@ LineChartData mainData() {
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: 1,
-          getTitlesWidget: bottomTitleWidgets,
+          reservedSize: 35,
+          interval: 3,
+          getTitlesWidget: (value, meta) =>
+              bottomTitleWidgets(value, meta, todayHourlyData),
         ),
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: 1,
+          reservedSize: 46,
+          interval: leftTitlesInterval.toDouble(),
           getTitlesWidget: leftTitleWidgets,
         ),
       ),
     ),
     borderData: FlBorderData(
       show: true,
-      border: Border.all(color: Colors.black),
+      border: Border.all(color: AppColors.forecastButtonText),
     ),
     minX: 0,
-    maxX: 11,
-    minY: 0,
-    maxY: 28,
+    maxX: (hourCount - 1).toDouble(),
+    minY: chartMinY.toDouble(),
+    maxY: chartMaxY.toDouble(),
     lineBarsData: [
-      LineChartBarData(
-        spots: const [
-          FlSpot(0, 3),
-          FlSpot(2.6, 2),
-          FlSpot(4.9, 5),
-          FlSpot(6.8, 3.1),
-          FlSpot(8, 4),
-          FlSpot(9.5, 3),
-          FlSpot(11, 4),
-        ],
-        isCurved: true,
-      ),
+      LineChartBarData(spots: spots(todayHourlyData), isCurved: true),
     ],
+    lineTouchData: LineTouchData(
+      touchTooltipData: LineTouchTooltipData(
+        maxContentWidth: 220,
+        getTooltipItems: (touchedSpots) {
+          return tooltipItems(touchedSpots, todayHourlyData);
+        },
+      ),
+    ),
   );
 }

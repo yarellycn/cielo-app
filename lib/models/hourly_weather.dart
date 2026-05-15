@@ -31,4 +31,9 @@ class HourlyWeather {
       weatherCode: (json['weather_code'] as num).toInt(),
     );
   }
+
+  @override
+  String toString() {
+    return 'HourlyWeather(time: $time, temperature: $temperature, humidity: $relativeHumidity)';
+  }
 }

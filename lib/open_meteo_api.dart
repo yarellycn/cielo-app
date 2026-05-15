@@ -125,6 +125,12 @@ class OpenMeteoApi {
       throw Exception('Daily weather not found in Open-Meteo response.');
     }
 
+    // final parsedHourlyWeatherData = _parseHourlyWeather(hourlyWeatherData);
+
+    // log('Parsed hourly count: ${parsedHourlyWeatherData.length}');
+    // log(parsedHourlyWeatherData.toString());
+    // log('First parsed hourly item: ${parsedHourlyWeatherData.first}');
+
     return ForecastData(
       timezone: json['timezone'] as String?,
       timezoneAbbreviation: json['timezone_abbreviation'] as String?,

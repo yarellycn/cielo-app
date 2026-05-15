@@ -49,8 +49,11 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
               ],
             ),
             SizedBox(
-              height: 200,
-              child: HourlyLineChart(hourlyWeatherData: widget.hourlyWeatherData),
+              height: 350,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 5, 0, 20),
+                child: HourlyLineChart(hourlyWeatherData: widget.hourlyWeatherData),
+              ),
             ),
           ],
         ),
