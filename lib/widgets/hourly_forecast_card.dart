@@ -33,26 +33,27 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.transparent, width: 2),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                'Données horaires',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          AspectRatio(
-            aspectRatio: 2.9,
-            child: Padding(
-              padding: const EdgeInsets.all(30.0),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          spacing: 20.00,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Données horaires',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 200,
               child: HourlyLineChart(hourlyWeatherData: widget.hourlyWeatherData),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
