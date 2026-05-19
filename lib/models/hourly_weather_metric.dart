@@ -1,4 +1,4 @@
-enum WeatherMetric {
+enum HourlyWeatherMetric {
   temperature,
   apparentTemperature,
   humidity,
