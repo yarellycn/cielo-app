@@ -9,8 +9,16 @@ class AppButtonStyles {
     borderRadius: BorderRadius.all(Radius.circular(8)),
   );
 
+  static const hourlyMetricButtonPadding = EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 10,
+  );
+  static const hourlyMetricButtonShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
   static TextStyle? _forecastButtonTextStyle(BuildContext context) {
-    return Theme.of(context).textTheme.labelMedium;
+    return Theme.of(context).textTheme.labelSmall;
   }
 
   static ButtonStyle forecastRangeButton(
@@ -19,7 +27,7 @@ class AppButtonStyles {
   }) {
     return FilledButton.styleFrom(
       elevation: forecastButtonElevation,
-      shadowColor: forecastButtonShadowColor,
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
       backgroundColor: isSelected
           ? AppColors.highlightedItemBackground
           : AppColors.forecastButtonBackground,
@@ -66,6 +74,26 @@ class AppButtonStyles {
             )?.copyWith(fontWeight: FontWeight.bold)
           : _forecastButtonTextStyle(context),
       shape: forecastButtonShape,
+    );
+  }
+
+  static ButtonStyle hourlyMetricButton(
+    BuildContext context, {
+    required bool isSelected,
+  }) {
+    return FilledButton.styleFrom(
+      shadowColor: Colors.transparent,
+      backgroundColor: isSelected ? Colors.white : Colors.transparent,
+      foregroundColor: isSelected ? Colors.black : AppColors.forecastButtonText,
+      overlayColor: Colors.transparent,
+      padding: hourlyMetricButtonPadding,
+      minimumSize: const Size(0, 0),
+      textStyle: isSelected
+          ? _forecastButtonTextStyle(
+              context,
+            )?.copyWith(fontWeight: FontWeight.bold)
+          : _forecastButtonTextStyle(context),
+      shape: hourlyMetricButtonShape,
     );
   }
 }
