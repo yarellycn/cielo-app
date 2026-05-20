@@ -115,6 +115,7 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
                 padding: const EdgeInsets.fromLTRB(20, 5, 0, 20),
                 child: HourlyLineChart(
                   hourlyWeatherData: widget.hourlyWeatherData,
+                  selectedMetric: selectedMetric,
                 ),
               ),
             ),

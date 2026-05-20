@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cielo_app/models/hourly_weather.dart';
+import 'package:cielo_app/models/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,13 @@ import 'package:intl/intl.dart';
 
 class HourlyLineChart extends StatefulWidget {
   final List<HourlyWeather>? hourlyWeatherData;
+  final HourlyWeatherMetric selectedMetric;
 
-  const HourlyLineChart({super.key, required this.hourlyWeatherData});
+  const HourlyLineChart({
+    super.key,
+    required this.hourlyWeatherData,
+    required this.selectedMetric,
+  });
 
   @override
   State<HourlyLineChart> createState() => HourlyLineChartState();
@@ -21,7 +27,32 @@ class HourlyLineChartState extends State<HourlyLineChart> {
     if (widget.hourlyWeatherData == null || widget.hourlyWeatherData!.isEmpty) {
       return Center(child: Text('Hourly weather data is not available.'));
     }
-    return LineChart(mainData(widget.hourlyWeatherData));
+    return LineChart(mainData(widget.hourlyWeatherData, widget.selectedMetric));
+  }
+}
+
+num getHourlyMetricValue(
+  HourlyWeather hourly,
+  HourlyWeatherMetric selectedMetric,
+) {
+  switch (selectedMetric) {
+    case HourlyWeatherMetric.temperature:
+      return hourly.temperature;
+    case HourlyWeatherMetric.apparentTemperature:
+      return hourly.apparentTemperature;
+    default:
+      return hourly.temperature;
+  }
+}
+
+String getMetricLabel(HourlyWeatherMetric selectedMetric) {
+  switch (selectedMetric) {
+    case HourlyWeatherMetric.temperature:
+      return 'Température';
+    case HourlyWeatherMetric.apparentTemperature:
+      return 'Ressenti';
+    default:
+      return 'Température';
   }
 }
 
@@ -70,17 +101,22 @@ Widget leftTitleWidgets(double value, TitleMeta meta) {
   );
 }
 
-List<FlSpot> spots(List<HourlyWeather> todayHourlyData) {
+List<FlSpot> spots(
+  List<HourlyWeather> todayHourlyData,
+  HourlyWeatherMetric selectedMetric,
+) {
   return List.generate(todayHourlyData.length, (index) {
     final hourlyData = todayHourlyData[index];
+    final value = getHourlyMetricValue(hourlyData, selectedMetric);
 
-    return FlSpot(index.toDouble(), hourlyData.temperature.toDouble());
+    return FlSpot(index.toDouble(), value.toDouble());
   });
 }
 
 List<LineTooltipItem?> tooltipItems(
   List<LineBarSpot> touchedSpots,
   List<HourlyWeather> todayHourlyData,
+  HourlyWeatherMetric selectedMetric,
 ) {
   return touchedSpots.map((touchedSpot) {
     final index = touchedSpot.x.toInt();
@@ -91,16 +127,20 @@ List<LineTooltipItem?> tooltipItems(
     final dateTime = hourlyData.time;
     final formattedDate = DateFormat('EEEE d MMMM', 'fr').format(dateTime);
     final formattedTime = DateFormat('HH:mm', 'fr').format(dateTime);
-    final temperature = hourlyData.temperature;
+    final value = getHourlyMetricValue(hourlyData, selectedMetric);
+    final label = getMetricLabel(selectedMetric);
 
     return LineTooltipItem(
-      '$formattedDate, $formattedTime\nTempérature: $temperature°C',
+      '$formattedDate, $formattedTime\n$label: $value°C',
       TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
     );
   }).toList();
 }
 
-LineChartData mainData(List<HourlyWeather>? hourlyWeatherData) {
+LineChartData mainData(
+  List<HourlyWeather>? hourlyWeatherData,
+  HourlyWeatherMetric selectedMetric,
+) {
   final today = DateUtils.dateOnly(DateTime.now());
 
   final todayHourlyData = hourlyWeatherData!.where((hourly) {
@@ -108,23 +148,25 @@ LineChartData mainData(List<HourlyWeather>? hourlyWeatherData) {
     return hourlyDate == today;
   }).toList();
 
-  final temperatures = todayHourlyData.map((hourly) => hourly.temperature);
+  final values = todayHourlyData.map(
+    (hourly) => getHourlyMetricValue(hourly, selectedMetric),
+  );
 
-  final minTemperature = temperatures.reduce((a, b) => a < b ? a : b);
-  final maxTemperature = temperatures.reduce((a, b) => a > b ? a : b);
-  log('Min temperature: $minTemperature');
-  log('Max temperature: $maxTemperature');
+  final minValue = values.reduce((a, b) => a < b ? a : b);
+  final maxValue = values.reduce((a, b) => a > b ? a : b);
+  log('Min value: $minValue');
+  log('Max value: $maxValue');
 
   final defaultMinY = 0;
   final defaultMaxY = 30;
   final leftTitlesInterval = 10;
 
-  final chartMinY = minTemperature < defaultMinY
-      ? (minTemperature / leftTitlesInterval).floor() * leftTitlesInterval
+  final chartMinY = minValue < defaultMinY
+      ? (minValue / leftTitlesInterval).floor() * leftTitlesInterval
       : defaultMinY;
 
-  final chartMaxY = maxTemperature > defaultMaxY
-      ? (maxTemperature / leftTitlesInterval).ceil() * leftTitlesInterval
+  final chartMaxY = maxValue > defaultMaxY
+      ? (maxValue / leftTitlesInterval).ceil() * leftTitlesInterval
       : defaultMaxY;
 
   log('chartMinY: $chartMinY');
@@ -168,13 +210,16 @@ LineChartData mainData(List<HourlyWeather>? hourlyWeatherData) {
     minY: chartMinY.toDouble(),
     maxY: chartMaxY.toDouble(),
     lineBarsData: [
-      LineChartBarData(spots: spots(todayHourlyData), isCurved: true),
+      LineChartBarData(
+        spots: spots(todayHourlyData, selectedMetric),
+        isCurved: true,
+      ),
     ],
     lineTouchData: LineTouchData(
       touchTooltipData: LineTouchTooltipData(
         maxContentWidth: 220,
         getTooltipItems: (touchedSpots) {
-          return tooltipItems(touchedSpots, todayHourlyData);
+          return tooltipItems(touchedSpots, todayHourlyData, selectedMetric);
         },
       ),
     ),
