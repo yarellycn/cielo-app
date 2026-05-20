@@ -32,22 +32,22 @@ class HourlyLineChartState extends State<HourlyLineChart> {
 }
 
 num getHourlyMetricValue(
-  HourlyWeather hourly,
+  HourlyWeather hourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
   switch (selectedMetric) {
     case HourlyWeatherMetric.temperature:
-      return hourly.temperature;
+      return hourlyData.temperature;
     case HourlyWeatherMetric.apparentTemperature:
-      return hourly.apparentTemperature;
+      return hourlyData.apparentTemperature;
     case HourlyWeatherMetric.humidity:
-      return hourly.relativeHumidity;
+      return hourlyData.relativeHumidity;
     case HourlyWeatherMetric.wind:
-      return hourly.windSpeed;
+      return hourlyData.windSpeed;
     case HourlyWeatherMetric.clouds:
-      return hourly.cloudCover;
+      return hourlyData.cloudCover;
     default:
-      return hourly.temperature;
+      return hourlyData.temperature;
   }
 }
 
@@ -65,6 +65,23 @@ String getMetricLabel(HourlyWeatherMetric selectedMetric) {
       return 'Nuages';
     default:
       return 'Température';
+  }
+}
+
+String getWeatherUnit(HourlyWeatherMetric selectedMetric) {
+  switch (selectedMetric) {
+    case HourlyWeatherMetric.temperature:
+      return '°C';
+    case HourlyWeatherMetric.apparentTemperature:
+      return '°C';
+    case HourlyWeatherMetric.humidity:
+      return '%';
+    case HourlyWeatherMetric.wind:
+      return 'km/h';
+    case HourlyWeatherMetric.clouds:
+      return '%';
+    default:
+      return '°C';
   }
 }
 
@@ -98,11 +115,17 @@ Widget bottomTitleWidgets(
   );
 }
 
-Widget leftTitleWidgets(double value, TitleMeta meta) {
+Widget leftTitleWidgets(
+  double value,
+  TitleMeta meta,
+  HourlyWeatherMetric selectedMetric,
+) {
+  final weatherUnit = getWeatherUnit(selectedMetric);
+
   return SideTitleWidget(
     meta: meta,
     child: Text(
-      '${value.round()}°C',
+      '${value.round()}$weatherUnit',
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 9,
@@ -141,9 +164,10 @@ List<LineTooltipItem?> tooltipItems(
     final formattedTime = DateFormat('HH:mm', 'fr').format(dateTime);
     final value = getHourlyMetricValue(hourlyData, selectedMetric);
     final label = getMetricLabel(selectedMetric);
+    final weatherUnit = getWeatherUnit(selectedMetric);
 
     return LineTooltipItem(
-      '$formattedDate, $formattedTime\n$label: $value°C',
+      '$formattedDate, $formattedTime\n$label: $value$weatherUnit',
       TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
     );
   }).toList();
@@ -155,13 +179,13 @@ LineChartData mainData(
 ) {
   final today = DateUtils.dateOnly(DateTime.now());
 
-  final todayHourlyData = hourlyWeatherData!.where((hourly) {
-    final hourlyDate = DateUtils.dateOnly(hourly.time);
+  final todayHourlyData = hourlyWeatherData!.where((hourlyData) {
+    final hourlyDate = DateUtils.dateOnly(hourlyData.time);
     return hourlyDate == today;
   }).toList();
 
   final values = todayHourlyData.map(
-    (hourly) => getHourlyMetricValue(hourly, selectedMetric),
+    (hourlyData) => getHourlyMetricValue(hourlyData, selectedMetric),
   );
 
   final minValue = values.reduce((a, b) => a < b ? a : b);
@@ -209,7 +233,8 @@ LineChartData mainData(
           showTitles: true,
           reservedSize: 46,
           interval: leftTitlesInterval.toDouble(),
-          getTitlesWidget: leftTitleWidgets,
+          getTitlesWidget: (value, meta) =>
+              leftTitleWidgets(value, meta, selectedMetric),
         ),
       ),
     ),
