@@ -108,7 +108,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.thermostat, color: Colors.blue),
+                            Icon(Icons.thermostat, color: AppColors.temperature),
                             Text('Température'),
                           ],
                         ),
@@ -124,7 +124,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.thermostat, color: Colors.orange),
+                            Icon(Icons.thermostat, color: AppColors.apparentTemperature),
                             Text('Ressenti'),
                           ],
                         ),
@@ -140,7 +140,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.water_drop_outlined, color: Colors.blue),
+                            Icon(Icons.water_drop_outlined, color: AppColors.humidity),
                             Text('Humidité'),
                           ],
                         ),
@@ -156,7 +156,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.air, color: Colors.green),
+                            Icon(Icons.air, color: AppColors.wind),
                             Text('Vent max'),
                           ],
                         ),
@@ -172,7 +172,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.cloudy_snowing, color: Colors.grey),
+                            Icon(Icons.cloudy_snowing, color: AppColors.precipitation),
                             Text('Précipitations'),
                           ],
                         ),
@@ -188,7 +188,7 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.cloud_queue, color: Colors.pink),
+                            Icon(Icons.cloud_queue, color: AppColors.clouds),
                             Text('Nuages'),
                           ],
                         ),

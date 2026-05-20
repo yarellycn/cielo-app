@@ -21,4 +21,11 @@ class AppColors {
     235,
     1,
   );
+
+  static const temperature = Colors.blue;
+  static const apparentTemperature = Colors.orange;
+  static const humidity = Colors.blue;
+  static const wind = Colors.green;
+  static const precipitation = Colors.grey;
+  static const clouds = Colors.pink;
 }
