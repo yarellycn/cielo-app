@@ -85,6 +85,23 @@ String getWeatherUnit(HourlyWeatherMetric selectedMetric) {
   }
 }
 
+MaterialColor getMetricColor(HourlyWeatherMetric selectedMetric) {
+  switch (selectedMetric) {
+    case HourlyWeatherMetric.temperature:
+      return AppColors.temperature;
+    case HourlyWeatherMetric.apparentTemperature:
+      return AppColors.apparentTemperature;
+    case HourlyWeatherMetric.humidity:
+      return AppColors.humidity;
+    case HourlyWeatherMetric.wind:
+      return AppColors.wind;
+    case HourlyWeatherMetric.clouds:
+      return AppColors.clouds;
+    default:
+      return AppColors.temperature;
+  }
+}
+
 Widget bottomTitleWidgets(
   double value,
   TitleMeta meta,
@@ -168,7 +185,7 @@ List<LineTooltipItem?> tooltipItems(
 
     return LineTooltipItem(
       '$formattedDate, $formattedTime\n$label: $value$weatherUnit',
-      TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+      TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
     );
   }).toList();
 }
@@ -209,6 +226,7 @@ LineChartData mainData(
   log('chartMaxY: $chartMaxY');
 
   final hourCount = todayHourlyData.length;
+  final metricColor = getMetricColor(selectedMetric);
 
   return LineChartData(
     gridData: FlGridData(
@@ -250,11 +268,30 @@ LineChartData mainData(
       LineChartBarData(
         spots: spots(todayHourlyData, selectedMetric),
         isCurved: true,
+        preventCurveOverShooting: selectedMetric == HourlyWeatherMetric.clouds
+            ? true
+            : false,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: LinearGradient(
+            begin: .topCenter,
+            end: .bottomCenter,
+            colors: [
+              metricColor.withValues(alpha: 0.35),
+              Colors.white.withValues(alpha: 0.35),
+            ],
+          ),
+        ),
+        color: metricColor,
       ),
     ],
     lineTouchData: LineTouchData(
       touchTooltipData: LineTouchTooltipData(
         maxContentWidth: 220,
+        tooltipBorder: BorderSide(color: AppColors.forecastButtonBackground, width: 1),
+        tooltipBorderRadius: BorderRadius.all(Radius.circular(12)),
+        getTooltipColor: (_) => Colors.white,
         getTooltipItems: (touchedSpots) {
           return tooltipItems(touchedSpots, todayHourlyData, selectedMetric);
         },
