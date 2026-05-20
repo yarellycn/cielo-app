@@ -40,6 +40,12 @@ num getHourlyMetricValue(
       return hourly.temperature;
     case HourlyWeatherMetric.apparentTemperature:
       return hourly.apparentTemperature;
+    case HourlyWeatherMetric.humidity:
+      return hourly.relativeHumidity;
+    case HourlyWeatherMetric.wind:
+      return hourly.windSpeed;
+    case HourlyWeatherMetric.clouds:
+      return hourly.cloudCover;
     default:
       return hourly.temperature;
   }
@@ -51,6 +57,12 @@ String getMetricLabel(HourlyWeatherMetric selectedMetric) {
       return 'Température';
     case HourlyWeatherMetric.apparentTemperature:
       return 'Ressenti';
+    case HourlyWeatherMetric.humidity:
+      return 'Humidité';
+    case HourlyWeatherMetric.wind:
+      return 'Vent';
+    case HourlyWeatherMetric.clouds:
+      return 'Nuages';
     default:
       return 'Température';
   }
