@@ -27,8 +27,119 @@ class HourlyLineChartState extends State<HourlyLineChart> {
     if (widget.hourlyWeatherData == null || widget.hourlyWeatherData!.isEmpty) {
       return Center(child: Text('Hourly weather data is not available.'));
     }
-    return LineChart(mainData(widget.hourlyWeatherData, widget.selectedMetric));
+
+    final todayHourlyData = getTodayHourlyData(widget.hourlyWeatherData!);
+
+    if (todayHourlyData.isEmpty) {
+      return const Center(child: Text('No hourly weather data available.'));
+    }
+
+    return LineChart(mainData(todayHourlyData, widget.selectedMetric));
   }
+}
+
+class AxisRange {
+  final double min;
+  final double max;
+  final double interval;
+
+  const AxisRange({
+    required this.min,
+    required this.max,
+    required this.interval,
+  });
+}
+
+AxisRange getAxisRange(
+  List<HourlyWeather> todayHourlyData,
+  HourlyWeatherMetric selectedMetric,
+) {
+  final values = todayHourlyData.map(
+    (hourlyData) => getHourlyMetricValue(hourlyData, selectedMetric),
+  );
+
+  final minValue = values.reduce((a, b) => a < b ? a : b);
+  final maxValue = values.reduce((a, b) => a > b ? a : b);
+
+  log('Min value: $minValue');
+  log('Max value: $maxValue');
+
+  switch (selectedMetric) {
+    case HourlyWeatherMetric.temperature:
+    case HourlyWeatherMetric.apparentTemperature:
+      final defaultMinY = 0;
+      final defaultMaxY = 30;
+      final defaultInterval = 10;
+
+      final chartMinY = minValue < defaultMinY
+          ? (minValue / defaultInterval).floor() * defaultInterval
+          : defaultMinY;
+
+      final chartMaxY = maxValue > defaultMaxY
+          ? (maxValue / defaultInterval).ceil() * defaultInterval
+          : defaultMaxY;
+
+      log('chartMinY: $chartMinY');
+      log('chartMaxY: $chartMaxY');
+
+      return AxisRange(
+        min: chartMinY.toDouble(),
+        max: chartMaxY.toDouble(),
+        interval: defaultInterval.toDouble(),
+      );
+    case HourlyWeatherMetric.humidity:
+      final defaultMinY = 0;
+      final defaultMaxY = 80;
+      final defaultInterval = 20;
+
+      final chartMaxY = maxValue > defaultMaxY ? 100 : defaultMaxY;
+      final chartInterval = maxValue > defaultMaxY ? 25 : defaultInterval;
+
+      return AxisRange(
+        min: defaultMinY.toDouble(),
+        max: chartMaxY.toDouble(),
+        interval: chartInterval.toDouble(),
+      );
+    case HourlyWeatherMetric.wind:
+      final defaultMinY = 0;
+      final defaultMaxY = 20;
+      final defaultInterval = 5;
+
+      final chartMaxY = maxValue > defaultMaxY
+          ? (maxValue / defaultInterval).ceil() * defaultInterval
+          : defaultMaxY;
+
+      return AxisRange(
+        min: defaultMinY.toDouble(),
+        max: chartMaxY.toDouble(),
+        interval: defaultInterval.toDouble(),
+      );
+    case HourlyWeatherMetric.precipitation:
+    case HourlyWeatherMetric.clouds:
+      final defaultMinY = 0;
+      final defaultMaxY = 4;
+      final defaultInterval = 1;
+
+      final chartMaxY = maxValue > defaultMaxY
+          ? (maxValue / defaultInterval).ceil() * defaultInterval
+          : defaultMaxY;
+
+      final chartInterval = maxValue > defaultMaxY ? 25 : defaultInterval;
+
+      return AxisRange(
+        min: defaultMinY.toDouble(),
+        max: chartMaxY.toDouble(),
+        interval: chartInterval.toDouble(),
+      );
+  }
+}
+
+List<HourlyWeather> getTodayHourlyData(List<HourlyWeather>? hourlyWeatherData) {
+  final today = DateUtils.dateOnly(DateTime.now());
+  return hourlyWeatherData!.where((hourlyData) {
+    final hourlyDate = DateUtils.dateOnly(hourlyData.time);
+    return hourlyDate == today;
+  }).toList();
 }
 
 num getHourlyMetricValue(
@@ -191,47 +302,19 @@ List<LineTooltipItem?> tooltipItems(
 }
 
 LineChartData mainData(
-  List<HourlyWeather>? hourlyWeatherData,
+  List<HourlyWeather> todayHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
-  final today = DateUtils.dateOnly(DateTime.now());
-
-  final todayHourlyData = hourlyWeatherData!.where((hourlyData) {
-    final hourlyDate = DateUtils.dateOnly(hourlyData.time);
-    return hourlyDate == today;
-  }).toList();
-
-  final values = todayHourlyData.map(
-    (hourlyData) => getHourlyMetricValue(hourlyData, selectedMetric),
-  );
-
-  final minValue = values.reduce((a, b) => a < b ? a : b);
-  final maxValue = values.reduce((a, b) => a > b ? a : b);
-  log('Min value: $minValue');
-  log('Max value: $maxValue');
-
-  final defaultMinY = 0;
-  final defaultMaxY = 30;
-  final leftTitlesInterval = 10;
-
-  final chartMinY = minValue < defaultMinY
-      ? (minValue / leftTitlesInterval).floor() * leftTitlesInterval
-      : defaultMinY;
-
-  final chartMaxY = maxValue > defaultMaxY
-      ? (maxValue / leftTitlesInterval).ceil() * leftTitlesInterval
-      : defaultMaxY;
-
-  log('chartMinY: $chartMinY');
-  log('chartMaxY: $chartMaxY');
-
+  final bottomTitlesInterval = 3;
   final hourCount = todayHourlyData.length;
   final metricColor = getMetricColor(selectedMetric);
+  final axisYRange = getAxisRange(todayHourlyData, selectedMetric);
 
   return LineChartData(
     gridData: FlGridData(
       show: true,
-      horizontalInterval: leftTitlesInterval.toDouble(),
+      horizontalInterval: axisYRange.interval,
+      verticalInterval: bottomTitlesInterval.toDouble(),
     ),
     titlesData: FlTitlesData(
       show: true,
@@ -250,7 +333,7 @@ LineChartData mainData(
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 46,
-          interval: leftTitlesInterval.toDouble(),
+          interval: axisYRange.interval,
           getTitlesWidget: (value, meta) =>
               leftTitleWidgets(value, meta, selectedMetric),
         ),
@@ -262,15 +345,14 @@ LineChartData mainData(
     ),
     minX: 0,
     maxX: (hourCount - 1).toDouble(),
-    minY: chartMinY.toDouble(),
-    maxY: chartMaxY.toDouble(),
+    minY: axisYRange.min,
+    maxY: axisYRange.max,
     lineBarsData: [
       LineChartBarData(
         spots: spots(todayHourlyData, selectedMetric),
         isCurved: true,
-        preventCurveOverShooting: selectedMetric == HourlyWeatherMetric.clouds
-            ? true
-            : false,
+        // preventCurveOverShooting: true,
+        preventCurveOverShooting: selectedMetric == HourlyWeatherMetric.clouds,
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(
           show: true,
@@ -289,7 +371,10 @@ LineChartData mainData(
     lineTouchData: LineTouchData(
       touchTooltipData: LineTouchTooltipData(
         maxContentWidth: 220,
-        tooltipBorder: BorderSide(color: AppColors.forecastButtonBackground, width: 1),
+        tooltipBorder: BorderSide(
+          color: AppColors.forecastButtonBackground,
+          width: 1,
+        ),
         tooltipBorderRadius: BorderRadius.all(Radius.circular(12)),
         getTooltipColor: (_) => Colors.white,
         getTooltipItems: (touchedSpots) {
