@@ -115,6 +115,7 @@ AxisRange getAxisRange(
         interval: defaultInterval.toDouble(),
       );
     case HourlyWeatherMetric.precipitation:
+      throw ArgumentError('Precipitation should use HourlyBarChart.');
     case HourlyWeatherMetric.clouds:
       final defaultMinY = 0;
       final defaultMaxY = 4;
@@ -305,7 +306,7 @@ LineChartData mainData(
   List<HourlyWeather> todayHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
-  final bottomTitlesInterval = 3;
+  final bottomTitlesInterval = 3.00;
   final hourCount = todayHourlyData.length;
   final metricColor = getMetricColor(selectedMetric);
   final axisYRange = getAxisRange(todayHourlyData, selectedMetric);
@@ -314,7 +315,7 @@ LineChartData mainData(
     gridData: FlGridData(
       show: true,
       horizontalInterval: axisYRange.interval,
-      verticalInterval: bottomTitlesInterval.toDouble(),
+      verticalInterval: bottomTitlesInterval,
     ),
     titlesData: FlTitlesData(
       show: true,
@@ -324,7 +325,7 @@ LineChartData mainData(
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 35,
-          interval: 3,
+          interval: bottomTitlesInterval,
           getTitlesWidget: (value, meta) =>
               bottomTitleWidgets(value, meta, todayHourlyData),
         ),
@@ -351,8 +352,7 @@ LineChartData mainData(
       LineChartBarData(
         spots: spots(todayHourlyData, selectedMetric),
         isCurved: true,
-        // preventCurveOverShooting: true,
-        preventCurveOverShooting: selectedMetric == HourlyWeatherMetric.clouds,
+        preventCurveOverShooting: true,
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(
           show: true,

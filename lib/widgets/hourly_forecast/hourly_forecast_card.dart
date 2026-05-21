@@ -4,6 +4,7 @@ import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:cielo_app/theme/app_colors.dart';
+import 'package:cielo_app/widgets/hourly_forecast/hourly_bar_chart.dart';
 import 'package:cielo_app/widgets/hourly_forecast/hourly_line_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -113,10 +114,14 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
               height: 350,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 5, 0, 20),
-                child: HourlyLineChart(
-                  hourlyWeatherData: widget.hourlyWeatherData,
-                  selectedMetric: selectedMetric,
-                ),
+                child: selectedMetric == HourlyWeatherMetric.precipitation
+                    ? HourlyBarChart(
+                        hourlyWeatherData: widget.hourlyWeatherData,
+                      )
+                    : HourlyLineChart(
+                        hourlyWeatherData: widget.hourlyWeatherData,
+                        selectedMetric: selectedMetric,
+                      ),
               ),
             ),
           ],
