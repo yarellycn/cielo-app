@@ -15,7 +15,7 @@ class CieloApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const CieloHomePage(),
+      home: const HomePage(),
     );
   }
 }

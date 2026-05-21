@@ -10,14 +10,14 @@ import 'package:cielo_app/widgets/daily_forecast/daily_forecast_list.dart';
 import 'package:cielo_app/widgets/forecast_range_selector/forecast_range_selector.dart';
 import 'package:cielo_app/widgets/hourly_forecast/hourly_forecast_card.dart';
 
-class CieloHomePage extends StatefulWidget {
-  const CieloHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<CieloHomePage> createState() => _CieloHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _CieloHomePageState extends State<CieloHomePage> {
+class _HomePageState extends State<HomePage> {
   ForecastRange selectedRange = ForecastRange.next3Days;
   DateTimeRange? selectedCustomRange;
   City? selectedCity;
