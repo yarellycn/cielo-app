@@ -1,4 +1,4 @@
-class CityData {
+class City {
   final String name;
   final double latitude;
   final double longitude;
@@ -6,7 +6,7 @@ class CityData {
   final String country;
   final String admin1;
 
-  const CityData({
+  const City({
     required this.name,
     required this.latitude,
     required this.longitude,
@@ -15,8 +15,8 @@ class CityData {
     required this.admin1,
   });
 
-  factory CityData.fromJson(Map<String, dynamic> json) {
-    return CityData(
+  factory City.fromJson(Map<String, dynamic> json) {
+    return City(
       name: (json['name'] as String),
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),

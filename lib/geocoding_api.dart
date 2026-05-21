@@ -1,12 +1,10 @@
 import 'dart:convert';
 
-import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/city.dart';
 import 'package:http/http.dart' as http;
 
 class GeocodingApi {
-  Future<List<CityData>> fetchCitiesData({
-    required String cityNameOrCode,
-  }) async {
+  Future<List<City>> fetchCitiesData({required String cityNameOrCode}) async {
     final params = {
       'name': cityNameOrCode.toString(),
       'count': '10',
@@ -34,7 +32,7 @@ class GeocodingApi {
     }
 
     return cityResults
-        .map((city) => CityData.fromJson(city as Map<String, dynamic>))
+        .map((city) => City.fromJson(city as Map<String, dynamic>))
         .toList();
   }
 }

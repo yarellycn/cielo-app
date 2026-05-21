@@ -1,4 +1,4 @@
-import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

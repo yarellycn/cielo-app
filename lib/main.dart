@@ -1,6 +1,6 @@
-import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/models/forecast_data.dart';
-import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/cielo_app_bar.dart';
@@ -46,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   ForecastRange selectedRange = ForecastRange.next3Days;
   DateTimeRange? selectedCustomRange;
-  CityData? selectedCity;
+  City? selectedCity;
 
   late Future<ForecastData> presetForecastDataFuture;
   late Future<ForecastData> forecastDataFuture;

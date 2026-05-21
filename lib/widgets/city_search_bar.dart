@@ -1,11 +1,11 @@
 import 'package:cielo_app/geocoding_api.dart';
-import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CitySearchBar extends StatefulWidget {
   final GeocodingApi? api;
-  final ValueChanged<CityData>? onCitySelected;
+  final ValueChanged<City>? onCitySelected;
 
   const CitySearchBar({super.key, this.api, this.onCitySelected});
 
@@ -41,7 +41,7 @@ class CitySearchBarState extends State<CitySearchBar> {
             elevation: isSearchFocused ? 0 : 1,
             borderRadius: BorderRadius.circular(borderRadius),
             clipBehavior: .antiAlias,
-            child: Autocomplete<CityData>(
+            child: Autocomplete<City>(
               displayStringForOption: (city) =>
                   '${city.name}, ${city.admin1}, ${city.country}',
               optionsViewBuilder: (context, onSelected, options) {
@@ -93,7 +93,7 @@ class CitySearchBarState extends State<CitySearchBar> {
                 final query = textEditingValue.text.trim();
 
                 if (query.length < minimumSearchLength) {
-                  return const Iterable<CityData>.empty();
+                  return const Iterable<City>.empty();
                 }
 
                 await Future<void>.delayed(searchDebounceDelay);
@@ -103,7 +103,7 @@ class CitySearchBarState extends State<CitySearchBar> {
                     cityNameOrCode: query,
                   );
                 } catch (_) {
-                  return const Iterable<CityData>.empty();
+                  return const Iterable<City>.empty();
                 }
               },
               fieldViewBuilder:

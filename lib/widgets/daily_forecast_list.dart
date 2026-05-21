@@ -1,5 +1,5 @@
 import 'package:cielo_app/models/daily_weather.dart';
-import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/widgets/daily_forecast_card.dart';
 import 'package:flutter/material.dart';
 

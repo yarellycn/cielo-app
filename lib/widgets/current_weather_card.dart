@@ -1,4 +1,4 @@
-import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/theme/app_colors.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CurrentWeatherCard extends StatefulWidget {
-  final CityData? selectedCity;
+  final City? selectedCity;
   final CurrentWeather? currentWeatherData;
   final String? timeZoneAbbreviation;
 

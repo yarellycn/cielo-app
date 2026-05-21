@@ -1,7 +1,7 @@
-import 'package:cielo_app/models/city_data.dart';
-import 'package:cielo_app/models/forecast_range.dart';
+import 'package:cielo_app/models/city.dart';
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
-import 'package:cielo_app/models/hourly_weather_metric.dart';
+import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/hourly_line_chart.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 class HourlyForecastCard extends StatefulWidget {
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
-  final CityData? selectedCity;
+  final City? selectedCity;
   final List<HourlyWeather> hourlyWeatherData;
 
   const HourlyForecastCard({

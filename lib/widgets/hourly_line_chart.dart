@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:cielo_app/models/hourly_weather.dart';
-import 'package:cielo_app/models/hourly_weather_metric.dart';
+import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

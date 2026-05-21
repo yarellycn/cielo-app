@@ -1,10 +1,10 @@
-import 'package:cielo_app/models/city_data.dart';
+import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/city_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final ValueChanged<CityData>? onCitySelected;
+  final ValueChanged<City>? onCitySelected;
   final double maxContentWidth;
   final double padding;
 
