@@ -32,8 +32,8 @@ class HourlyWeather {
     );
   }
 
-  @override
-  String toString() {
-    return 'HourlyWeather(time: $time, temperature: $temperature, humidity: $relativeHumidity)';
-  }
+  // @override
+  // String toString() {
+  //   return 'HourlyWeather(time: $time, temperature: $temperature, humidity: $relativeHumidity)';
+  // }
 }
