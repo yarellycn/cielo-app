@@ -14,10 +14,10 @@ class CieloHomePage extends StatefulWidget {
   const CieloHomePage({super.key});
 
   @override
-  State<CieloHomePage> createState() => CieloHomePageState();
+  State<CieloHomePage> createState() => _CieloHomePageState();
 }
 
-class CieloHomePageState extends State<CieloHomePage> {
+class _CieloHomePageState extends State<CieloHomePage> {
   ForecastRange selectedRange = ForecastRange.next3Days;
   DateTimeRange? selectedCustomRange;
   City? selectedCity;
@@ -67,11 +67,15 @@ class CieloHomePageState extends State<CieloHomePage> {
     forecastDataFuture = presetForecastDataFuture;
   }
 
-  Widget getCurrentWeatherCard(BuildContext context, TextTheme textTheme) {
+  Widget buildForecastSection({
+    required Future<Forecast> future,
+    required Widget Function(Forecast forecast) builder,
+  }) {
     return FutureBuilder<Forecast>(
-      future: presetForecastDataFuture,
-      // initialData: presetForecastData,
+      future: future,
       builder: (context, snapshot) {
+        final textTheme = Theme.of(context).textTheme;
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: SizedBox.square(
@@ -95,6 +99,16 @@ class CieloHomePageState extends State<CieloHomePage> {
 
         final forecastData = snapshot.data!;
 
+        return builder(forecastData);
+      },
+    );
+  }
+
+  Widget buildCurrentWeatherCard() {
+    return buildForecastSection(
+      future: presetForecastDataFuture,
+      // initialData: presetForecastData,
+      builder: (forecastData) {
         return CurrentWeatherCard(
           selectedCity: selectedCity,
           currentWeatherData: forecastData.currentWeatherData,
@@ -104,7 +118,7 @@ class CieloHomePageState extends State<CieloHomePage> {
     );
   }
 
-  Widget getForecastRangeSelector() {
+  Widget buildForecastRangeSelector() {
     return ForecastRangeSelector(
       selectedRange: selectedRange,
       selectedCustomRange: selectedCustomRange,
@@ -133,38 +147,15 @@ class CieloHomePageState extends State<CieloHomePage> {
     );
   }
 
-  Widget getHourlyForecastCard(BuildContext context, TextTheme textTheme) {
+  Widget buildHourlyForecastCard() {
     return Column(
       crossAxisAlignment: .start,
       spacing: 20,
       children: [
-        FutureBuilder<Forecast>(
+        buildForecastSection(
           future: forecastDataFuture,
           // initialData: presetForecastData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: SizedBox.square(
-                  dimension: 32,
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (snapshot.hasError) {
-              return Text(
-                'Unable to load weather data: ${snapshot.error}',
-                style: textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Text('No data available');
-            }
-
-            final forecastData = snapshot.data!;
-
+          builder: (forecastData) {
             return HourlyForecastCard(
               selectedRange: selectedRange,
               selectedCustomRange: selectedCustomRange,
@@ -177,48 +168,21 @@ class CieloHomePageState extends State<CieloHomePage> {
     );
   }
 
-  Widget getDailyWeatherList(
-    BuildContext context,
-    TextTheme textTheme,
-    double dailyWeatherListWidth,
-  ) {
+  Widget buildDailyWeatherList(double dailyWeatherListWidth) {
     return Column(
       crossAxisAlignment: .start,
       spacing: 20,
       children: [
         Text(
-          'Prévisons journalières',
+          'Prévisions journalières',
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        FutureBuilder<Forecast>(
+        buildForecastSection(
           future: forecastDataFuture,
           // initialData: presetForecastData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: SizedBox.square(
-                  dimension: 32,
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (snapshot.hasError) {
-              return Text(
-                'Unable to load weather data: ${snapshot.error}',
-                style: textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Text('No data available');
-            }
-
-            final forecastData = snapshot.data!;
-
+          builder: (forecastData) {
             return DailyForecastList(
               dailyWeatherData: forecastData.dailyWeatherData,
               selectedRange: selectedRange,
@@ -235,7 +199,6 @@ class CieloHomePageState extends State<CieloHomePage> {
   Widget build(BuildContext context) {
     const double widgetWidth = 1250.00;
     const double homePadding = 20.00;
-    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
@@ -275,14 +238,10 @@ class CieloHomePageState extends State<CieloHomePage> {
                 padding: const EdgeInsets.all(homePadding),
                 children:
                     [
-                          getCurrentWeatherCard(context, textTheme),
-                          getForecastRangeSelector(),
-                          getHourlyForecastCard(context, textTheme),
-                          getDailyWeatherList(
-                            context,
-                            textTheme,
-                            widgetWidth - homePadding * 2,
-                          ),
+                          buildCurrentWeatherCard(),
+                          buildForecastRangeSelector(),
+                          buildHourlyForecastCard(),
+                          buildDailyWeatherList(widgetWidth - homePadding * 2),
                         ]
                         .expand(
                           (widget) => [widget, const SizedBox(height: 20)],
