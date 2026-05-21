@@ -1,6 +1,6 @@
 import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/theme/app_colors.dart';
-import 'package:cielo_app/widgets/city_search_bar.dart';
+import 'package:cielo_app/widgets/app_bar/city_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {

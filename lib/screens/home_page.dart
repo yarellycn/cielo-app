@@ -4,11 +4,11 @@ import 'package:cielo_app/models/forecast.dart';
 import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/theme/app_colors.dart';
-import 'package:cielo_app/widgets/cielo_app_bar.dart';
-import 'package:cielo_app/widgets/current_weather_card.dart';
-import 'package:cielo_app/widgets/daily_forecast_list.dart';
-import 'package:cielo_app/widgets/forecast_range_selector.dart';
-import 'package:cielo_app/widgets/hourly_forecast_card.dart';
+import 'package:cielo_app/widgets/app_bar/cielo_app_bar.dart';
+import 'package:cielo_app/widgets/current_weather/current_weather_card.dart';
+import 'package:cielo_app/widgets/daily_forecast/daily_forecast_list.dart';
+import 'package:cielo_app/widgets/forecast_range_selector/forecast_range_selector.dart';
+import 'package:cielo_app/widgets/hourly_forecast/hourly_forecast_card.dart';
 
 class CieloHomePage extends StatefulWidget {
   const CieloHomePage({super.key});

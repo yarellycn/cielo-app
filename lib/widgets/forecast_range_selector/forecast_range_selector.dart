@@ -1,7 +1,7 @@
 import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:cielo_app/theme/app_colors.dart';
-import 'package:cielo_app/widgets/custom_date_range_button.dart';
+import 'package:cielo_app/widgets/forecast_range_selector/date_range_picker_button.dart';
 import 'package:flutter/material.dart';
 
 class ForecastRangeSelector extends StatelessWidget {

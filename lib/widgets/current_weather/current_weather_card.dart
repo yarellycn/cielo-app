@@ -2,7 +2,7 @@ import 'package:cielo_app/models/city.dart';
 import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/weather_code.dart';
 import 'package:cielo_app/theme/app_colors.dart';
-import 'package:cielo_app/widgets/weather_info_tile.dart';
+import 'package:cielo_app/widgets/current_weather/weather_info_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

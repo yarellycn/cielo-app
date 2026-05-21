@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-class CustomDateRangeButton extends StatelessWidget {
+class DateRangePickerButton extends StatelessWidget {
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
   final ValueChanged<DateTimeRange> onCustomSelectedRange;
 
-  const CustomDateRangeButton({
+  const DateRangePickerButton({
     super.key,
     required this.selectedRange,
     required this.selectedCustomRange,
@@ -50,7 +50,7 @@ class CustomDateRangeButton extends StatelessWidget {
     final isSelected = selectedRange == ForecastRange.custom;
 
     return FilledButton(
-      style: AppButtonStyles.customDateRangeButton(
+      style: AppButtonStyles.DateRangePickerButton(
         context,
         isSelected: isSelected,
       ),

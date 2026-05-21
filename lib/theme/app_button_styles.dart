@@ -49,7 +49,7 @@ class AppButtonStyles {
     );
   }
 
-  static ButtonStyle customDateRangeButton(
+  static ButtonStyle DateRangePickerButton(
     BuildContext context, {
     required bool isSelected,
   }) {

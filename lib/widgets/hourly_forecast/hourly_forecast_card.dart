@@ -4,7 +4,7 @@ import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:cielo_app/theme/app_colors.dart';
-import 'package:cielo_app/widgets/hourly_line_chart.dart';
+import 'package:cielo_app/widgets/hourly_forecast/hourly_line_chart.dart';
 import 'package:flutter/material.dart';
 
 class HourlyForecastCard extends StatefulWidget {
