@@ -75,7 +75,7 @@ class ForecastRangeSelector extends StatelessWidget {
                     color: AppColors.forecastButtonText,
                   ),
                   Text('Intervalle:'),
-                  CustomDateRangeButton(
+                  DateRangePickerButton(
                     selectedRange: selectedRange,
                     selectedCustomRange: selectedCustomRange,
                     onCustomSelectedRange: onCustomSelectedRange,

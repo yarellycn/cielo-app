@@ -50,7 +50,7 @@ class DateRangePickerButton extends StatelessWidget {
     final isSelected = selectedRange == ForecastRange.custom;
 
     return FilledButton(
-      style: AppButtonStyles.DateRangePickerButton(
+      style: AppButtonStyles.dateRangePickerButton(
         context,
         isSelected: isSelected,
       ),
