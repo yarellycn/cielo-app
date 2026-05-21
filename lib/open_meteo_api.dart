@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:cielo_app/models/current_weather.dart';
 import 'package:cielo_app/models/daily_weather.dart';
-import 'package:cielo_app/models/forecast_data.dart';
+import 'package:cielo_app/models/forecast.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +20,7 @@ class OpenMeteoApi {
   }
 
   /// Fetches the historical weather data for the specified latitude and longitude.
-  Future<ForecastData> fetchHistoricalWeatherData({
+  Future<Forecast> fetchHistoricalWeatherData({
     required DateTime startDate,
     required DateTime endDate,
     required double latitude,
@@ -65,7 +65,7 @@ class OpenMeteoApi {
       throw Exception('Daily weather not found in Open-Meteo response.');
     }
 
-    return ForecastData(
+    return Forecast(
       timezone: json['timezone'] as String?,
       timezoneAbbreviation: json['timezone_abbreviation'] as String?,
       utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toInt(),
@@ -75,7 +75,7 @@ class OpenMeteoApi {
   }
 
   /// Fetches the forecast weather data for the specified latitude and longitude.
-  Future<ForecastData> fetchForecastWeatherDataForRange({
+  Future<Forecast> fetchForecastWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
     required double latitude,
@@ -131,7 +131,7 @@ class OpenMeteoApi {
     // log(parsedHourlyWeatherData.toString());
     // log('First parsed hourly item: ${parsedHourlyWeatherData.first}');
 
-    return ForecastData(
+    return Forecast(
       timezone: json['timezone'] as String?,
       timezoneAbbreviation: json['timezone_abbreviation'] as String?,
       utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toInt(),
@@ -142,7 +142,7 @@ class OpenMeteoApi {
   }
 
   /// Fetches the weather data for the specified latitude and longitude using both historical and forecast requests.
-  Future<ForecastData> fetchWeatherDataForRange({
+  Future<Forecast> fetchWeatherDataForRange({
     required DateTime startDate,
     required DateTime endDate,
     required double latitude,
@@ -188,7 +188,7 @@ class OpenMeteoApi {
       longitude: longitude,
     );
 
-    return ForecastData(
+    return Forecast(
       timezone: forecastData.timezone ?? historicalData.timezone,
       timezoneAbbreviation:
           forecastData.timezoneAbbreviation ??

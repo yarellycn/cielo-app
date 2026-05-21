@@ -1,5 +1,5 @@
 import 'package:cielo_app/models/city.dart';
-import 'package:cielo_app/models/forecast_data.dart';
+import 'package:cielo_app/models/forecast.dart';
 import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/open_meteo_api.dart';
 import 'package:cielo_app/theme/app_colors.dart';
@@ -48,9 +48,9 @@ class MyHomePageState extends State<MyHomePage> {
   DateTimeRange? selectedCustomRange;
   City? selectedCity;
 
-  late Future<ForecastData> presetForecastDataFuture;
-  late Future<ForecastData> forecastDataFuture;
-  ForecastData? presetForecastData;
+  late Future<Forecast> presetForecastDataFuture;
+  late Future<Forecast> forecastDataFuture;
+  Forecast? presetForecastData;
   bool isShowingCustomForecastData = false;
 
   double getLatitude() {
@@ -61,7 +61,7 @@ class MyHomePageState extends State<MyHomePage> {
     return selectedCity?.longitude ?? OpenMeteoApi.defaultLongitude;
   }
 
-  Future<ForecastData> fetchDefaultForecastData() {
+  Future<Forecast> fetchDefaultForecastData() {
     final today = DateUtils.dateOnly(DateTime.now());
 
     return OpenMeteoApi()
@@ -77,7 +77,7 @@ class MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  Future<ForecastData> fetchCustomRangeForecastData(DateTimeRange range) {
+  Future<Forecast> fetchCustomRangeForecastData(DateTimeRange range) {
     return OpenMeteoApi().fetchWeatherDataForRange(
       startDate: range.start,
       endDate: range.end,
@@ -94,7 +94,7 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   Widget getCurrentWeatherCard(BuildContext context, TextTheme textTheme) {
-    return FutureBuilder<ForecastData>(
+    return FutureBuilder<Forecast>(
       future: presetForecastDataFuture,
       // initialData: presetForecastData,
       builder: (context, snapshot) {
@@ -164,7 +164,7 @@ class MyHomePageState extends State<MyHomePage> {
       crossAxisAlignment: .start,
       spacing: 20,
       children: [
-        FutureBuilder<ForecastData>(
+        FutureBuilder<Forecast>(
           future: forecastDataFuture,
           // initialData: presetForecastData,
           builder: (context, snapshot) {
@@ -218,7 +218,7 @@ class MyHomePageState extends State<MyHomePage> {
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        FutureBuilder<ForecastData>(
+        FutureBuilder<Forecast>(
           future: forecastDataFuture,
           // initialData: presetForecastData,
           builder: (context, snapshot) {
