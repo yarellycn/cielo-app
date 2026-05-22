@@ -57,14 +57,23 @@ class CitySearchBarState extends State<CitySearchBar> {
                         maxWidth: searchBarMaxWidth,
                         maxHeight: 260,
                       ),
-                      child: ListView.builder(
+                      child: Builder(
+                        builder: (context) {
+                          final highlightedIndex =
+                              AutocompleteHighlightedOption.of(context);
+
+                          return ListView.builder(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: options.length,
                         itemBuilder: (context, index) {
                           final city = options.elementAt(index);
+                              final isHighlighted = index == highlightedIndex;
 
                           return ListTile(
+                                tileColor: isHighlighted
+                                    ? AppColors.highlightedItemBackground
+                                    : Colors.white,
                             leading: const Icon(
                               Icons.pin_drop,
                               color: Colors.blue,
@@ -82,6 +91,8 @@ class CitySearchBarState extends State<CitySearchBar> {
                               ),
                             ),
                             onTap: () => onSelected(city),
+                              );
+                            },
                           );
                         },
                       ),
