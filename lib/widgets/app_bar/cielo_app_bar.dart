@@ -54,7 +54,7 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
                   isAntiAlias: true,
                 ),
                 Material(
-                  // color: Colors.amber,
+                  color: Colors.transparent,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
