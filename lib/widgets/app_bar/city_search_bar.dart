@@ -20,6 +20,7 @@ class CitySearchBarState extends State<CitySearchBar> {
   final double searchBarMaxWidth = 500;
   final double borderRadius = 12;
   bool isSearchFocused = false;
+  TextEditingController? _textEditingController;
 
   @override
   Widget build(BuildContext context) {
@@ -63,34 +64,34 @@ class CitySearchBarState extends State<CitySearchBar> {
                               AutocompleteHighlightedOption.of(context);
 
                           return ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final city = options.elementAt(index);
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (context, index) {
+                              final city = options.elementAt(index);
                               final isHighlighted = index == highlightedIndex;
 
-                          return ListTile(
+                              return ListTile(
                                 tileColor: isHighlighted
                                     ? AppColors.highlightedItemBackground
                                     : Colors.white,
-                            leading: const Icon(
-                              Icons.pin_drop,
-                              color: Colors.blue,
-                            ),
-                            title: Text(
-                              city.name,
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${city.admin1}, ${city.country}',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: seachFieldTextColor,
-                              ),
-                            ),
-                            onTap: () => onSelected(city),
+                                leading: const Icon(
+                                  Icons.pin_drop,
+                                  color: Colors.blue,
+                                ),
+                                title: Text(
+                                  city.name,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '${city.admin1}, ${city.country}',
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: seachFieldTextColor,
+                                  ),
+                                ),
+                                onTap: () => onSelected(city),
                               );
                             },
                           );
@@ -102,6 +103,7 @@ class CitySearchBarState extends State<CitySearchBar> {
               },
               onSelected: (city) {
                 widget.onCitySelected?.call(city);
+                _textEditingController?.clear();
               },
               optionsBuilder: (TextEditingValue textEditingValue) async {
                 final query = textEditingValue.text.trim();
@@ -127,6 +129,8 @@ class CitySearchBarState extends State<CitySearchBar> {
                     focusNode,
                     onFieldSubmitted,
                   ) {
+                    _textEditingController = textEditingController;
+
                     return ValueListenableBuilder(
                       valueListenable: textEditingController,
                       builder: (context, value, child) {
