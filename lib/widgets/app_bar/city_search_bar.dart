@@ -24,7 +24,7 @@ class CitySearchBarState extends State<CitySearchBar> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final seachFieldTextColor = AppColors.forecastButtonText;
-    final searchFieldTextStyle = textTheme.bodyMedium?.copyWith(
+    final searchFieldTextStyle = textTheme.bodySmall?.copyWith(
       color: seachFieldTextColor,
     );
 
@@ -49,6 +49,8 @@ class CitySearchBarState extends State<CitySearchBar> {
                   alignment: Alignment.topLeft,
                   child: Material(
                     elevation: 4,
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    clipBehavior: .antiAlias,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: searchBarMaxWidth,
@@ -126,6 +128,7 @@ class CitySearchBarState extends State<CitySearchBar> {
                         prefixIconColor: AppColors.forecastButtonText,
                         filled: true,
                         fillColor: Colors.white,
+                            hoverColor: Colors.transparent,
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
