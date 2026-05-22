@@ -22,6 +22,7 @@ class DailyForecastCard extends StatelessWidget {
     ).format(dailyWeatherData.date);
 
     final isItToday = dailyWeatherData.date == today;
+    final isItThePast = dailyWeatherData.date.isBefore(today);
 
     final textTheme = Theme.of(context).textTheme.bodySmall;
     final double parametersRowSpacing = 10;
@@ -85,7 +86,28 @@ class DailyForecastCard extends StatelessWidget {
                       ],
                     ),
                     Row(
+                      spacing: 12,
                       children: [
+                        // if (isItThePast) Icon(Icons.history, color: AppColors.forecastButtonText),
+                        if (isItThePast)
+                          Material(
+                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.forecastButtonBackground,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              child: Text(
+                                'Passé',
+                                style: TextStyle(
+                                  color: AppColors.forecastButtonText,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ),
+
                         if (weatherCode != null)
                           Image.asset(
                             weatherCode.iconAsset,
@@ -108,7 +130,10 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.thermostat, color: AppColors.temperature),
+                            Icon(
+                              Icons.thermostat,
+                              color: AppColors.temperature,
+                            ),
                             Text('Température'),
                           ],
                         ),
@@ -124,7 +149,10 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.thermostat, color: AppColors.apparentTemperature),
+                            Icon(
+                              Icons.thermostat,
+                              color: AppColors.apparentTemperature,
+                            ),
                             Text('Ressenti'),
                           ],
                         ),
@@ -140,7 +168,10 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.water_drop_outlined, color: AppColors.humidity),
+                            Icon(
+                              Icons.water_drop_outlined,
+                              color: AppColors.humidity,
+                            ),
                             Text('Humidité'),
                           ],
                         ),
@@ -172,7 +203,10 @@ class DailyForecastCard extends StatelessWidget {
                         Row(
                           spacing: parametersRowSpacing,
                           children: [
-                            Icon(Icons.cloudy_snowing, color: AppColors.precipitation),
+                            Icon(
+                              Icons.cloudy_snowing,
+                              color: AppColors.precipitation,
+                            ),
                             Text('Précipitations'),
                           ],
                         ),
