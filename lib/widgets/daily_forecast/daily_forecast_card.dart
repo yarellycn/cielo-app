@@ -88,7 +88,6 @@ class DailyForecastCard extends StatelessWidget {
                     Row(
                       spacing: 12,
                       children: [
-                        // if (isItThePast) Icon(Icons.history, color: AppColors.forecastButtonText),
                         if (isItThePast)
                           Material(
                             borderRadius: BorderRadius.circular(8),
