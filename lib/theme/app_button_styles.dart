@@ -96,4 +96,15 @@ class AppButtonStyles {
       shape: hourlyMetricButtonShape,
     );
   }
+
+  static ButtonStyle clearButton() {
+    return IconButton.styleFrom(
+      backgroundColor: AppColors.forecastButtonText.withValues(alpha: 0.12),
+      foregroundColor: AppColors.forecastButtonText,
+      minimumSize: const Size(24, 24),
+      fixedSize: const Size(24, 24),
+      padding: EdgeInsets.zero,
+      shape: const CircleBorder(),
+    );
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:cielo_app/geocoding_api.dart';
 import 'package:cielo_app/models/city.dart';
+import 'package:cielo_app/theme/app_button_styles.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -115,30 +116,52 @@ class CitySearchBarState extends State<CitySearchBar> {
                     focusNode,
                     onFieldSubmitted,
                   ) {
-                    return TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onSubmitted: (_) => onFieldSubmitted(),
-                      style: searchFieldTextStyle,
+                    return ValueListenableBuilder(
+                      valueListenable: textEditingController,
+                      builder: (context, value, child) {
+                        return TextField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          onSubmitted: (_) => onFieldSubmitted(),
+                          style: searchFieldTextStyle,
 
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher une ville...',
-                        prefixIcon: const Icon(Icons.search, size: 18),
-                        hintStyle: searchFieldTextStyle,
-                        prefixIconColor: AppColors.forecastButtonText,
-                        filled: true,
-                        fillColor: Colors.white,
+                          decoration: InputDecoration(
+                            hintText: 'Rechercher une ville...',
+                            prefixIcon: const Icon(Icons.search, size: 18),
+                            hintStyle: searchFieldTextStyle,
+                            prefixIconColor: AppColors.forecastButtonText,
+                            filled: true,
+                            fillColor: Colors.white,
                             hoverColor: Colors.transparent,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: AppColors.highlightedItemBorder,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: AppColors.highlightedItemBorder,
+                              ),
+                              borderRadius: BorderRadius.circular(borderRadius),
+                            ),
+                            suffixIcon: textEditingController.text.isEmpty
+                                ? null
+                                : Padding(
+                                    padding: const EdgeInsets.only(right: 8.00),
+                                    child: IconButton(
+                                      tooltip: 'Effacer',
+                                      icon: const Icon(Icons.close, size: 12),
+                                      onPressed: () {
+                                        textEditingController.clear();
+                                      },
+                                      style: AppButtonStyles.clearButton(),
+                                    ),
+                                  ),
+                            suffixIconConstraints: const BoxConstraints(
+                              minWidth: 30,
+                              minHeight: 30,
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(borderRadius),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
             ),
