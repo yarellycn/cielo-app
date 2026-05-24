@@ -148,7 +148,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildHourlyForecastCard() {
+  Widget buildHourlyForecastCard(bool isPhoneLayout) {
     return Column(
       crossAxisAlignment: .start,
       spacing: 20,
@@ -162,6 +162,7 @@ class _HomePageState extends State<HomePage> {
               selectedCustomRange: selectedCustomRange,
               selectedCity: selectedCity,
               hourlyWeatherData: forecastData.hourlyWeatherData,
+              shouldStackButtons: isPhoneLayout,
             );
           },
         ),
@@ -249,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                     [
                           buildCurrentWeatherCard(isPhoneLayout),
                           buildForecastRangeSelector(),
-                          buildHourlyForecastCard(),
+                          buildHourlyForecastCard(isPhoneLayout),
                           buildDailyWeatherList(widgetWidth - homePadding * 2),
                         ]
                         .expand(
