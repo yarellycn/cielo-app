@@ -24,6 +24,7 @@ class AppButtonStyles {
   static ButtonStyle forecastRangeButton(
     BuildContext context, {
     required bool isSelected,
+    required bool shouldStackRangePicker,
   }) {
     return FilledButton.styleFrom(
       elevation: forecastButtonElevation,
@@ -34,7 +35,7 @@ class AppButtonStyles {
       foregroundColor: isSelected
           ? AppColors.highlightedItemText
           : AppColors.forecastButtonText,
-      padding: forecastButtonPadding,
+      padding: shouldStackRangePicker ? EdgeInsets.all(6) : forecastButtonPadding,
       side: BorderSide(
         color: isSelected
             ? AppColors.highlightedItemBorder

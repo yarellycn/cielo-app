@@ -9,6 +9,7 @@ class ForecastRangeSelector extends StatelessWidget {
   final DateTimeRange? selectedCustomRange;
   final ValueChanged<ForecastRange> onRangeSelected;
   final ValueChanged<DateTimeRange> onCustomSelectedRange;
+  final bool shouldStackRangePicker;
 
   const ForecastRangeSelector({
     super.key,
@@ -16,6 +17,7 @@ class ForecastRangeSelector extends StatelessWidget {
     required this.selectedCustomRange,
     required this.onRangeSelected,
     required this.onCustomSelectedRange,
+    required this.shouldStackRangePicker,
   });
 
   @override
@@ -27,9 +29,45 @@ class ForecastRangeSelector extends StatelessWidget {
         style: AppButtonStyles.forecastRangeButton(
           context,
           isSelected: isSelected,
+          shouldStackRangePicker: shouldStackRangePicker,
         ),
         onPressed: () => onRangeSelected(range),
         child: Text(label),
+      );
+    }
+
+    Widget buildRangeButtonsContainer() {
+      return Wrap(
+        spacing: 8.00,
+        runSpacing: 6,
+        alignment: .center,
+        children: <Widget>[
+          rangeButton(range: ForecastRange.past3Days, label: '3 j. passés'),
+          rangeButton(range: ForecastRange.today, label: "Aujourd'hui"),
+          rangeButton(range: ForecastRange.next3Days, label: '3 prochains j.'),
+          rangeButton(range: ForecastRange.next7Days, label: '7 prochains j.'),
+          rangeButton(range: ForecastRange.all, label: 'Tout'),
+        ],
+      );
+    }
+
+    Widget buildRangePickerContainer() {
+      return Row(
+        mainAxisAlignment: shouldStackRangePicker ? .center : .start,
+        spacing: 8.00,
+        children: [
+          Icon(
+            Icons.date_range,
+            size: 15.00,
+            color: AppColors.forecastButtonText,
+          ),
+          Text('Intervalle:'),
+          DateRangePickerButton(
+            selectedRange: selectedRange,
+            selectedCustomRange: selectedCustomRange,
+            onCustomSelectedRange: onCustomSelectedRange,
+          ),
+        ],
       );
     }
 
@@ -43,47 +81,21 @@ class ForecastRangeSelector extends StatelessWidget {
         ).textTheme.labelMedium?.copyWith(color: AppColors.forecastButtonText),
         child: Padding(
           padding: EdgeInsets.all(15.00),
-          child: Row(
-            spacing: 20.00,
-            children: [
-              Row(
-                spacing: 8.00,
-                crossAxisAlignment: .center,
-                children: <Widget>[
-                  rangeButton(
-                    range: ForecastRange.past3Days,
-                    label: '3 j. passés',
-                  ),
-                  rangeButton(range: ForecastRange.today, label: "Aujourd'hui"),
-                  rangeButton(
-                    range: ForecastRange.next3Days,
-                    label: '3 prochains j.',
-                  ),
-                  rangeButton(
-                    range: ForecastRange.next7Days,
-                    label: '7 prochains j.',
-                  ),
-                  rangeButton(range: ForecastRange.all, label: 'Tout'),
-                ],
-              ),
-              Row(
-                spacing: 8.00,
-                children: [
-                  Icon(
-                    Icons.date_range,
-                    size: 15.00,
-                    color: AppColors.forecastButtonText,
-                  ),
-                  Text('Intervalle:'),
-                  DateRangePickerButton(
-                    selectedRange: selectedRange,
-                    selectedCustomRange: selectedCustomRange,
-                    onCustomSelectedRange: onCustomSelectedRange,
-                  ),
-                ],
-              ),
-            ],
-          ),
+          child: shouldStackRangePicker
+              ? Column(
+                  spacing: 20.00,
+                  children: [
+                    buildRangeButtonsContainer(),
+                    buildRangePickerContainer(),
+                  ],
+                )
+              : Row(
+                  spacing: 20.00,
+                  children: [
+                    buildRangeButtonsContainer(),
+                    buildRangePickerContainer(),
+                  ],
+                ),
         ),
       ),
     );

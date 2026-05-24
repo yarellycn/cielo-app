@@ -119,10 +119,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildForecastRangeSelector() {
+  Widget buildForecastRangeSelector(bool isPhoneLayout) {
     return ForecastRangeSelector(
       selectedRange: selectedRange,
       selectedCustomRange: selectedCustomRange,
+      shouldStackRangePicker: isPhoneLayout,
       onRangeSelected: (range) {
         setState(() {
           selectedRange = range;
@@ -255,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                 children:
                     [
                           buildCurrentWeatherCard(isPhoneLayout),
-                          buildForecastRangeSelector(),
+                          buildForecastRangeSelector(isPhoneLayout),
                           buildHourlyForecastCard(isPhoneLayout),
                           buildDailyWeatherList(
                             widgetWidth - homePadding * 2,
