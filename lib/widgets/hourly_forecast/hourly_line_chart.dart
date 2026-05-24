@@ -34,13 +34,18 @@ class HourlyLineChartState extends State<HourlyLineChart> {
       hourlyWeatherData: widget.hourlyWeatherData,
       selectedRange: widget.selectedRange,
       selectedCustomRange: widget.selectedCustomRange,
-      builder: (visibleHourlyData) =>
-          LineChart(mainData(visibleHourlyData, widget.selectedMetric)),
+      builder: (visibleHourlyData) => LineChart(
+        mainData(
+          visibleHourlyData,
+          widget.selectedMetric,
+          widget.selectedRange,
+        ),
+      ),
     );
   }
 }
 
-ChartYAxisRange getAxisRange(
+ChartYAxisRange getYAxisRange(
   List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
@@ -125,77 +130,6 @@ ChartYAxisRange getAxisRange(
   }
 }
 
-num getHourlyMetricValue(
-  HourlyWeather hourlyData,
-  HourlyWeatherMetric selectedMetric,
-) {
-  switch (selectedMetric) {
-    case HourlyWeatherMetric.temperature:
-      return hourlyData.temperature;
-    case HourlyWeatherMetric.apparentTemperature:
-      return hourlyData.apparentTemperature;
-    case HourlyWeatherMetric.humidity:
-      return hourlyData.relativeHumidity;
-    case HourlyWeatherMetric.wind:
-      return hourlyData.windSpeed;
-    case HourlyWeatherMetric.clouds:
-      return hourlyData.cloudCover;
-    default:
-      return hourlyData.temperature;
-  }
-}
-
-String getMetricLabel(HourlyWeatherMetric selectedMetric) {
-  switch (selectedMetric) {
-    case HourlyWeatherMetric.temperature:
-      return 'Température';
-    case HourlyWeatherMetric.apparentTemperature:
-      return 'Ressenti';
-    case HourlyWeatherMetric.humidity:
-      return 'Humidité';
-    case HourlyWeatherMetric.wind:
-      return 'Vent';
-    case HourlyWeatherMetric.clouds:
-      return 'Nuages';
-    default:
-      return 'Température';
-  }
-}
-
-String getWeatherUnit(HourlyWeatherMetric selectedMetric) {
-  switch (selectedMetric) {
-    case HourlyWeatherMetric.temperature:
-      return '°C';
-    case HourlyWeatherMetric.apparentTemperature:
-      return '°C';
-    case HourlyWeatherMetric.humidity:
-      return '%';
-    case HourlyWeatherMetric.wind:
-      return 'km/h';
-    case HourlyWeatherMetric.clouds:
-      return '%';
-    default:
-      return '°C';
-  }
-}
-
-MaterialColor getMetricColor(HourlyWeatherMetric selectedMetric) {
-  switch (selectedMetric) {
-    case HourlyWeatherMetric.temperature:
-      return AppColors.temperature;
-    case HourlyWeatherMetric.apparentTemperature:
-      return AppColors.apparentTemperature;
-    case HourlyWeatherMetric.humidity:
-      return AppColors.humidity;
-    case HourlyWeatherMetric.wind:
-      return AppColors.wind;
-    case HourlyWeatherMetric.clouds:
-      return AppColors.clouds;
-    default:
-      return AppColors.temperature;
-  }
-}
-
 Widget bottomTitleWidgets(
   double value,
   TitleMeta meta,
@@ -269,16 +203,12 @@ List<LineTooltipItem?> tooltipItems(
     if (index < 0 || index >= visibleHourlyData.length) {
       return null;
     }
-    final hourlyData = visibleHourlyData[index];
-    final dateTime = hourlyData.time;
-    final formattedDate = DateFormat('EEEE d MMMM', 'fr').format(dateTime);
-    final formattedTime = DateFormat('HH:mm', 'fr').format(dateTime);
-    final value = getHourlyMetricValue(hourlyData, selectedMetric);
-    final label = getMetricLabel(selectedMetric);
-    final weatherUnit = getWeatherUnit(selectedMetric);
 
     return LineTooltipItem(
-      '$formattedDate, $formattedTime\n$label: $value$weatherUnit',
+      getHourlyTooltipLabel(
+        hourlyData: visibleHourlyData[index],
+        selectedMetric: selectedMetric,
+      ),
       TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
     );
   }).toList();
@@ -287,17 +217,18 @@ List<LineTooltipItem?> tooltipItems(
 LineChartData mainData(
   List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
+  ForecastRange selectedRange,
 ) {
-  final bottomTitlesInterval = 3.00;
   final hourCount = visibleHourlyData.length;
   final metricColor = getMetricColor(selectedMetric);
-  final axisYRange = getAxisRange(visibleHourlyData, selectedMetric);
+  final axisYRange = getYAxisRange(visibleHourlyData, selectedMetric);
+  final xInterval = getXInterval(selectedRange, visibleHourlyData);
 
   return LineChartData(
     gridData: FlGridData(
       show: true,
       horizontalInterval: axisYRange.interval,
-      verticalInterval: bottomTitlesInterval,
+      verticalInterval: xInterval,
     ),
     titlesData: FlTitlesData(
       show: true,
@@ -307,7 +238,7 @@ LineChartData mainData(
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 35,
-          interval: bottomTitlesInterval,
+          interval: xInterval,
           getTitlesWidget: (value, meta) =>
               bottomTitleWidgets(value, meta, visibleHourlyData),
         ),

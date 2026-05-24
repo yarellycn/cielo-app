@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cielo_app/enums/forecast_range.dart';
+import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:cielo_app/theme/app_colors.dart';
 import 'package:cielo_app/widgets/hourly_forecast/hourly_chart_helpers.dart';
@@ -31,7 +32,8 @@ class HourlyBarChartState extends State<HourlyBarChart> {
       hourlyWeatherData: widget.hourlyWeatherData,
       selectedRange: widget.selectedRange,
       selectedCustomRange: widget.selectedCustomRange,
-      builder: (visibleHourlyData) => BarChart(mainData(visibleHourlyData)),
+      builder: (visibleHourlyData) =>
+          BarChart(mainData(visibleHourlyData, widget.selectedRange)),
     );
   }
 }
@@ -89,7 +91,9 @@ Widget bottomTitleWidgets(
 }
 
 ChartYAxisRange getAxisRange(List<HourlyWeather> visibleHourlyData) {
-  final values = visibleHourlyData.map((hourlyData) => hourlyData.precipitation);
+  final values = visibleHourlyData.map(
+    (hourlyData) => hourlyData.precipitation,
+  );
 
   final minValue = values.reduce((a, b) => a < b ? a : b);
   final maxValue = values.reduce((a, b) => a > b ? a : b);
@@ -129,15 +133,42 @@ Widget leftTitleWidgets(double value, TitleMeta meta) {
   );
 }
 
-BarChartData mainData(List<HourlyWeather> visibleHourlyData) {
-  final bottomTitlesInterval = 2.00;
+BarTooltipItem? barTooltipItem(
+  BarChartGroupData group,
+  int groupIndex,
+  BarChartRodData rod,
+  int rodIndex,
+  List<HourlyWeather> visibleHourlyData,
+) {
+  if (groupIndex < 0 || groupIndex >= visibleHourlyData.length) {
+    return null;
+  }
+
+  return BarTooltipItem(
+    getHourlyTooltipLabel(
+      hourlyData: visibleHourlyData[groupIndex],
+      selectedMetric: HourlyWeatherMetric.precipitation,
+    ),
+    const TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+    ),
+  );
+}
+
+BarChartData mainData(
+  List<HourlyWeather> visibleHourlyData,
+  ForecastRange selectedRange,
+) {
   final axisYRange = getAxisRange(visibleHourlyData);
+  final xInterval = getXInterval(selectedRange, visibleHourlyData);
 
   return BarChartData(
     gridData: FlGridData(
       show: true,
       horizontalInterval: axisYRange.interval,
-      verticalInterval: bottomTitlesInterval,
+      verticalInterval: xInterval,
     ),
     titlesData: FlTitlesData(
       rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -146,12 +177,9 @@ BarChartData mainData(List<HourlyWeather> visibleHourlyData) {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 35,
-          getTitlesWidget: (value, meta) => bottomTitleWidgets(
-            value,
-            meta,
-            visibleHourlyData,
-            bottomTitlesInterval,
-          ),
+          // interval:
+          getTitlesWidget: (value, meta) =>
+              bottomTitleWidgets(value, meta, visibleHourlyData, xInterval),
         ),
       ),
       leftTitles: AxisTitles(
@@ -170,5 +198,20 @@ BarChartData mainData(List<HourlyWeather> visibleHourlyData) {
       border: Border.all(color: AppColors.forecastButtonText),
     ),
     barGroups: barValues(visibleHourlyData),
+    barTouchData: BarTouchData(
+      touchTooltipData: BarTouchTooltipData(
+        maxContentWidth: 220,
+        tooltipBorder: BorderSide(
+          color: AppColors.forecastButtonBackground,
+          width: 1,
+        ),
+        tooltipBorderRadius: const BorderRadius.all(Radius.circular(12)),
+        getTooltipColor: (_) => Colors.white,
+        fitInsideHorizontally: true,
+        fitInsideVertically: true,
+        getTooltipItem: (group, groupIndex, rod, rodIndex) =>
+            barTooltipItem(group, groupIndex, rod, rodIndex, visibleHourlyData),
+      ),
+    ),
   );
 }
