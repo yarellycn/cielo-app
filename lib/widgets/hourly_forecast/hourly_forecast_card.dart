@@ -13,7 +13,7 @@ class HourlyForecastCard extends StatefulWidget {
   final DateTimeRange? selectedCustomRange;
   final City? selectedCity;
   final List<HourlyWeather> hourlyWeatherData;
-  final bool shouldStackButtons;
+  final bool isPhoneLayout;
 
   const HourlyForecastCard({
     super.key,
@@ -21,7 +21,7 @@ class HourlyForecastCard extends StatefulWidget {
     required this.selectedCustomRange,
     required this.selectedCity,
     required this.hourlyWeatherData,
-    required this.shouldStackButtons,
+    required this.isPhoneLayout,
   });
 
   @override
@@ -31,7 +31,8 @@ class HourlyForecastCard extends StatefulWidget {
 class HourlyForecastCardState extends State<HourlyForecastCard> {
   HourlyWeatherMetric selectedMetric = HourlyWeatherMetric.temperature;
 
-  bool get shouldStackButtons => widget.shouldStackButtons;
+  bool get isPhoneLayout => widget.isPhoneLayout;
+  bool get shouldStackButtons => isPhoneLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -134,12 +135,14 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
                         hourlyWeatherData: widget.hourlyWeatherData,
                         selectedRange: widget.selectedRange,
                         selectedCustomRange: widget.selectedCustomRange,
+                        isPhoneLayout: isPhoneLayout,
                       )
                     : HourlyLineChart(
                         hourlyWeatherData: widget.hourlyWeatherData,
                         selectedMetric: selectedMetric,
                         selectedRange: widget.selectedRange,
                         selectedCustomRange: widget.selectedCustomRange,
+                        isPhoneLayout: isPhoneLayout,
                       ),
               ),
             ),

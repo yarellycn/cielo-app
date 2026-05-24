@@ -13,12 +13,14 @@ class HourlyBarChart extends StatefulWidget {
   final List<HourlyWeather>? hourlyWeatherData;
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
+  final bool isPhoneLayout;
 
   const HourlyBarChart({
     super.key,
     required this.hourlyWeatherData,
     required this.selectedRange,
     required this.selectedCustomRange,
+    required this.isPhoneLayout,
   });
 
   @override
@@ -32,8 +34,9 @@ class HourlyBarChartState extends State<HourlyBarChart> {
       hourlyWeatherData: widget.hourlyWeatherData,
       selectedRange: widget.selectedRange,
       selectedCustomRange: widget.selectedCustomRange,
-      builder: (visibleHourlyData) =>
-          BarChart(mainData(visibleHourlyData, widget.selectedRange)),
+      builder: (visibleHourlyData) => BarChart(
+        mainData(visibleHourlyData, widget.selectedRange, widget.isPhoneLayout),
+      ),
     );
   }
 }
@@ -160,9 +163,14 @@ BarTooltipItem? barTooltipItem(
 BarChartData mainData(
   List<HourlyWeather> visibleHourlyData,
   ForecastRange selectedRange,
+  bool isPhoneLayout,
 ) {
   final axisYRange = getAxisRange(visibleHourlyData);
-  final xInterval = getXInterval(selectedRange, visibleHourlyData);
+  final xInterval = getXInterval(
+    selectedRange,
+    visibleHourlyData,
+    isPhoneLayout,
+  );
 
   return BarChartData(
     gridData: FlGridData(

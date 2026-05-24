@@ -14,6 +14,7 @@ class HourlyLineChart extends StatefulWidget {
   final HourlyWeatherMetric selectedMetric;
   final ForecastRange selectedRange;
   final DateTimeRange? selectedCustomRange;
+  final bool isPhoneLayout;
 
   const HourlyLineChart({
     super.key,
@@ -21,6 +22,7 @@ class HourlyLineChart extends StatefulWidget {
     required this.selectedMetric,
     required this.selectedRange,
     required this.selectedCustomRange,
+    required this.isPhoneLayout,
   });
 
   @override
@@ -39,6 +41,7 @@ class HourlyLineChartState extends State<HourlyLineChart> {
           visibleHourlyData,
           widget.selectedMetric,
           widget.selectedRange,
+          widget.isPhoneLayout,
         ),
       ),
     );
@@ -218,11 +221,16 @@ LineChartData mainData(
   List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
   ForecastRange selectedRange,
+  bool isPhoneLayout,
 ) {
   final hourCount = visibleHourlyData.length;
   final metricColor = getMetricColor(selectedMetric);
   final axisYRange = getYAxisRange(visibleHourlyData, selectedMetric);
-  final xInterval = getXInterval(selectedRange, visibleHourlyData);
+  final xInterval = getXInterval(
+    selectedRange,
+    visibleHourlyData,
+    isPhoneLayout,
+  );
 
   return LineChartData(
     gridData: FlGridData(

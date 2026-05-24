@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> {
               selectedCustomRange: selectedCustomRange,
               selectedCity: selectedCity,
               hourlyWeatherData: forecastData.hourlyWeatherData,
-              shouldStackButtons: isPhoneLayout,
+              isPhoneLayout: isPhoneLayout,
             );
           },
         ),

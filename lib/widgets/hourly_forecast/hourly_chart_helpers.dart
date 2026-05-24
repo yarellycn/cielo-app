@@ -77,34 +77,57 @@ Widget buildHourlyChart({
   return builder(visibleHourlyData);
 }
 
+int getVisibleDayCount(List<HourlyWeather> visibleHourlyData) {
+  return visibleHourlyData
+      .map((hourlyData) => DateUtils.dateOnly(hourlyData.time))
+      .toSet()
+      .length;
+}
+
 double getXInterval(
   ForecastRange selectedRange,
   List<HourlyWeather> visibleHourlyData,
+  bool isPhoneLayout,
 ) {
-  int hourCount = visibleHourlyData.length;
+  final hourCount = visibleHourlyData.length;
+  final dayCount = getVisibleDayCount(visibleHourlyData);
+
+  int getMaxNumberOfTitles(
+    int dayCount,
+    int preferredNumberOfVisibleHoursPerDays,
+  ) {
+    return (dayCount * preferredNumberOfVisibleHoursPerDays).toInt();
+  }
+
+  final numberOfTitlesForPhone = 6;
+
   double getInterval(int hourCount, int maxNumberOfTitles) {
     return hourCount / maxNumberOfTitles;
   }
 
-  switch (selectedRange) {
-    case ForecastRange.past3Days:
-      final maxNumberOfTitles = 12;
-      return getInterval(hourCount, maxNumberOfTitles);
-    case ForecastRange.today:
-      final maxNumberOfTitles = 12;
-      return getInterval(hourCount, maxNumberOfTitles);
-    case ForecastRange.next3Days:
-      final maxNumberOfTitles = 16;
-      return getInterval(hourCount, maxNumberOfTitles);
-    case ForecastRange.next7Days:
-      final maxNumberOfTitles = 16;
-      return getInterval(hourCount, maxNumberOfTitles);
-    case ForecastRange.all:
-      final maxNumberOfTitles = 22;
-      return getInterval(hourCount, maxNumberOfTitles);
-    case ForecastRange.custom:
-      final maxNumberOfTitles = 12;
-      return getInterval(hourCount, maxNumberOfTitles);
+  if (isPhoneLayout) {
+    return getInterval(hourCount, numberOfTitlesForPhone);
+  } else {
+    switch (selectedRange) {
+      case ForecastRange.past3Days:
+        final maxNumberOfTitles = getMaxNumberOfTitles(dayCount, 4);
+        return getInterval(hourCount, maxNumberOfTitles);
+      case ForecastRange.today:
+        final maxNumberOfTitles = 12;
+        return getInterval(hourCount, maxNumberOfTitles);
+      case ForecastRange.next3Days:
+        final maxNumberOfTitles = getMaxNumberOfTitles(dayCount, 4);
+        return getInterval(hourCount, maxNumberOfTitles);
+      case ForecastRange.next7Days:
+        final maxNumberOfTitles = getMaxNumberOfTitles(dayCount, 2);
+        return getInterval(hourCount, maxNumberOfTitles);
+      case ForecastRange.all:
+        final maxNumberOfTitles = getMaxNumberOfTitles(dayCount, 2);
+        return getInterval(hourCount, maxNumberOfTitles);
+      case ForecastRange.custom:
+        final maxNumberOfTitles = 12;
+        return getInterval(hourCount, maxNumberOfTitles);
+    }
   }
 }
 
