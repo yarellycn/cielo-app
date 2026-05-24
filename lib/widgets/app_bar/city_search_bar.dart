@@ -7,8 +7,16 @@ import 'package:flutter/material.dart';
 class CitySearchBar extends StatefulWidget {
   final GeocodingApi? api;
   final ValueChanged<City>? onCitySelected;
+  final double maxBarHeight;
+  final bool expandToAvailableWidth;
 
-  const CitySearchBar({super.key, this.api, this.onCitySelected});
+  const CitySearchBar({
+    super.key,
+    this.api,
+    this.onCitySelected,
+    required this.maxBarHeight,
+    this.expandToAvailableWidth = false,
+  });
 
   @override
   State<CitySearchBar> createState() => CitySearchBarState();
@@ -30,156 +38,154 @@ class CitySearchBarState extends State<CitySearchBar> {
       color: seachFieldTextColor,
     );
 
-    return Flexible(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: searchBarMaxWidth, maxHeight: 40),
-        child: Focus(
-          onFocusChange: (hasFocus) {
-            setState(() {
-              isSearchFocused = hasFocus;
-            });
-          },
-          child: Material(
-            elevation: isSearchFocused ? 0 : 1,
-            borderRadius: BorderRadius.circular(borderRadius),
-            clipBehavior: .antiAlias,
-            child: Autocomplete<City>(
-              displayStringForOption: (city) =>
-                  '${city.name}, ${city.admin1}, ${city.country}',
-              optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    clipBehavior: .antiAlias,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: searchBarMaxWidth,
-                        maxHeight: 260,
-                      ),
-                      child: Builder(
-                        builder: (context) {
-                          final highlightedIndex =
-                              AutocompleteHighlightedOption.of(context);
-
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            itemCount: options.length,
-                            itemBuilder: (context, index) {
-                              final city = options.elementAt(index);
-                              final isHighlighted = index == highlightedIndex;
-
-                              return ListTile(
-                                tileColor: isHighlighted
-                                    ? AppColors.highlightedItemBackground
-                                    : Colors.white,
-                                leading: const Icon(
-                                  Icons.pin_drop,
-                                  color: Colors.blue,
-                                ),
-                                title: Text(
-                                  city.name,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  '${city.admin1}, ${city.country}',
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: seachFieldTextColor,
-                                  ),
-                                ),
-                                onTap: () => onSelected(city),
-                              );
-                            },
-                          );
-                        },
-                      ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: widget.expandToAvailableWidth
+            ? double.infinity
+            : searchBarMaxWidth,
+        maxHeight: widget.maxBarHeight,
+      ),
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          setState(() {
+            isSearchFocused = hasFocus;
+          });
+        },
+        child: Material(
+          elevation: isSearchFocused ? 0 : 1,
+          borderRadius: BorderRadius.circular(borderRadius),
+          clipBehavior: .antiAlias,
+          child: Autocomplete<City>(
+            displayStringForOption: (city) =>
+                '${city.name}, ${city.admin1}, ${city.country}',
+            optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  clipBehavior: .antiAlias,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: searchBarMaxWidth,
+                      maxHeight: 260,
                     ),
-                  ),
-                );
-              },
-              onSelected: (city) {
-                widget.onCitySelected?.call(city);
-                _textEditingController?.clear();
-              },
-              optionsBuilder: (TextEditingValue textEditingValue) async {
-                final query = textEditingValue.text.trim();
+                    child: Builder(
+                      builder: (context) {
+                        final highlightedIndex =
+                            AutocompleteHighlightedOption.of(context);
 
-                if (query.length < minimumSearchLength) {
-                  return const Iterable<City>.empty();
-                }
+                        return ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (context, index) {
+                            final city = options.elementAt(index);
+                            final isHighlighted = index == highlightedIndex;
 
-                await Future<void>.delayed(searchDebounceDelay);
-
-                try {
-                  return await (widget.api ?? GeocodingApi()).fetchCitiesData(
-                    cityNameOrCode: query,
-                  );
-                } catch (_) {
-                  return const Iterable<City>.empty();
-                }
-              },
-              fieldViewBuilder:
-                  (
-                    context,
-                    textEditingController,
-                    focusNode,
-                    onFieldSubmitted,
-                  ) {
-                    _textEditingController = textEditingController;
-
-                    return ValueListenableBuilder(
-                      valueListenable: textEditingController,
-                      builder: (context, value, child) {
-                        return TextField(
-                          controller: textEditingController,
-                          focusNode: focusNode,
-                          onSubmitted: (_) => onFieldSubmitted(),
-                          style: searchFieldTextStyle,
-
-                          decoration: InputDecoration(
-                            hintText: 'Rechercher une ville...',
-                            prefixIcon: const Icon(Icons.search, size: 18),
-                            hintStyle: searchFieldTextStyle,
-                            prefixIconColor: AppColors.forecastButtonText,
-                            filled: true,
-                            fillColor: Colors.white,
-                            hoverColor: Colors.transparent,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: AppColors.highlightedItemBorder,
+                            return ListTile(
+                              tileColor: isHighlighted
+                                  ? AppColors.highlightedItemBackground
+                                  : Colors.white,
+                              leading: const Icon(
+                                Icons.pin_drop,
+                                color: Colors.blue,
                               ),
-                              borderRadius: BorderRadius.circular(borderRadius),
-                            ),
-                            suffixIcon: textEditingController.text.isEmpty
-                                ? null
-                                : Padding(
-                                    padding: const EdgeInsets.only(right: 8.00),
-                                    child: IconButton(
-                                      tooltip: 'Effacer',
-                                      icon: const Icon(Icons.close, size: 12),
-                                      onPressed: () {
-                                        textEditingController.clear();
-                                      },
-                                      style: AppButtonStyles.clearButton(),
-                                    ),
-                                  ),
-                            suffixIconConstraints: const BoxConstraints(
-                              minWidth: 30,
-                              minHeight: 30,
-                            ),
-                          ),
+                              title: Text(
+                                city.name,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                '${city.admin1}, ${city.country}',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: seachFieldTextColor,
+                                ),
+                              ),
+                              onTap: () => onSelected(city),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-            ),
+                    ),
+                  ),
+                ),
+              );
+            },
+            onSelected: (city) {
+              widget.onCitySelected?.call(city);
+              _textEditingController?.clear();
+            },
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              final query = textEditingValue.text.trim();
+
+              if (query.length < minimumSearchLength) {
+                return const Iterable<City>.empty();
+              }
+
+              await Future<void>.delayed(searchDebounceDelay);
+
+              try {
+                return await (widget.api ?? GeocodingApi()).fetchCitiesData(
+                  cityNameOrCode: query,
+                );
+              } catch (_) {
+                return const Iterable<City>.empty();
+              }
+            },
+            fieldViewBuilder:
+                (context, textEditingController, focusNode, onFieldSubmitted) {
+                  _textEditingController = textEditingController;
+
+                  return ValueListenableBuilder(
+                    valueListenable: textEditingController,
+                    builder: (context, value, child) {
+                      return TextField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        onSubmitted: (_) => onFieldSubmitted(),
+                        style: searchFieldTextStyle,
+
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher une ville...',
+                          prefixIcon: const Icon(Icons.search, size: 18),
+                          hintStyle: searchFieldTextStyle,
+                          prefixIconColor: AppColors.forecastButtonText,
+                          filled: true,
+                          fillColor: Colors.white,
+                          hoverColor: Colors.transparent,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: AppColors.highlightedItemBorder,
+                            ),
+                            borderRadius: BorderRadius.circular(borderRadius),
+                          ),
+                          suffixIcon: textEditingController.text.isEmpty
+                              ? null
+                              : Padding(
+                                  padding: const EdgeInsets.only(right: 8.00),
+                                  child: IconButton(
+                                    tooltip: 'Effacer',
+                                    icon: const Icon(Icons.close, size: 12),
+                                    onPressed: () {
+                                      textEditingController.clear();
+                                    },
+                                    style: AppButtonStyles.clearButton(),
+                                  ),
+                                ),
+                          suffixIconConstraints: const BoxConstraints(
+                            minWidth: 30,
+                            minHeight: 30,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
           ),
         ),
       ),

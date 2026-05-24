@@ -200,11 +200,18 @@ class _HomePageState extends State<HomePage> {
     const double widgetWidth = 1250.00;
     const double homePadding = 20.00;
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final availableAppBarWidth =
+        screenWidth.clamp(0.0, widgetWidth) - (homePadding * 2);
+
+    final shouldStackSearchBar = availableAppBarWidth < 634;
+
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
       appBar: CieloAppBar(
         maxContentWidth: widgetWidth,
         padding: homePadding,
+        shouldStackSearchBar: shouldStackSearchBar,
         onCitySelected: (city) {
           setState(() {
             selectedCity = city;
@@ -244,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                           buildDailyWeatherList(widgetWidth - homePadding * 2),
                         ]
                         .expand(
-                          (widget) => [widget, const SizedBox(height: 20)],
+                          (widget) => [widget, const SizedBox(height: homePadding)],
                         )
                         .toList(),
               ),

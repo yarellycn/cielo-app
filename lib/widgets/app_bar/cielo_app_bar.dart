@@ -7,82 +7,135 @@ class CieloAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<City>? onCitySelected;
   final double maxContentWidth;
   final double padding;
+  final bool shouldStackSearchBar;
 
   const CieloAppBar({
     super.key,
     required this.maxContentWidth,
     required this.padding,
     this.onCitySelected,
+    required this.shouldStackSearchBar,
   });
-  static const appBarHeight = 75.00;
+
   static const _iconSize = 40.00;
   static const _logoWidth = 85.00;
   static const _logoHeight = 27.00;
+  static const maxHeightSearchBar = 40.00;
+  static const appBarContentHeight = _iconSize;
+  static const stackedSpacing = 14.00;
+
+  double get stackedBarHeight =>
+      appBarContentHeight + stackedSpacing + maxHeightSearchBar + padding * 2;
+
+  double get minHeightAppBar => appBarContentHeight + padding * 2;
 
   @override
-  Size get preferredSize => const Size.fromHeight(appBarHeight);
+  Size get preferredSize => Size.fromHeight(
+    shouldStackSearchBar ? stackedBarHeight : minHeightAppBar,
+  );
 
   @override
   Widget build(BuildContext context) {
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
 
+    Widget buildAppBarContent(
+      double contentSpacing, {
+      bool flexibleText = false,
+    }) {
+      final logoAndText = Material(
+        color: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/logos/app_logo.png',
+              width: _logoWidth,
+              height: _logoHeight,
+              cacheWidth: (_logoWidth * devicePixelRatio).round(),
+              cacheHeight: (_logoHeight * devicePixelRatio).round(),
+              filterQuality: FilterQuality.high,
+              fit: BoxFit.contain,
+              isAntiAlias: true,
+            ),
+            Text(
+              'HISTORIQUE ET PRÉVISIONS MÉTÉO',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: AppColors.logoColor,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      );
+
+      return Row(
+        spacing: contentSpacing,
+        children: [
+          Image.asset(
+            'assets/icons/app_icon.png',
+            width: _iconSize,
+            height: _iconSize,
+            cacheWidth: (_iconSize * devicePixelRatio).round(),
+            cacheHeight: (_iconSize * devicePixelRatio).round(),
+            filterQuality: FilterQuality.high,
+            fit: BoxFit.contain,
+            isAntiAlias: true,
+          ),
+          flexibleText ? Flexible(child: logoAndText) : logoAndText,
+        ],
+      );
+    }
+
     return AppBar(
-      toolbarHeight: appBarHeight,
+      toolbarHeight: shouldStackSearchBar ? stackedBarHeight : minHeightAppBar,
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       backgroundColor: AppColors.mainBackgroundColor,
-      // backgroundColor: Colors.orange,
       shape: const Border(
         bottom: BorderSide(color: AppColors.forecastButtonBackground),
       ),
-      title: Center(
+      title: Align(
+        alignment: shouldStackSearchBar
+            ? Alignment.topCenter
+            : Alignment.center,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Row(
-              spacing: 20,
-              children: [
-                Image.asset(
-                  'assets/icons/app_icon.png',
-                  width: _iconSize,
-                  height: _iconSize,
-                  cacheWidth: (_iconSize * devicePixelRatio).round(),
-                  cacheHeight: (_iconSize * devicePixelRatio).round(),
-                  filterQuality: FilterQuality.high,
-                  fit: BoxFit.contain,
-                  isAntiAlias: true,
-                ),
-                Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+            padding: EdgeInsets.all(padding),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final barSpacing = shouldStackSearchBar ? 14.00 : 40.00;
+                final logoSpacing = 20.00;
+
+                if (shouldStackSearchBar) {
+                  return Column(
+                    crossAxisAlignment: .stretch,
+                    spacing: barSpacing,
                     children: [
-                      Image.asset(
-                        'assets/logos/app_logo.png',
-                        width: _logoWidth,
-                        height: _logoHeight,
-                        cacheWidth: (_logoWidth * devicePixelRatio).round(),
-                        cacheHeight: (_logoHeight * devicePixelRatio).round(),
-                        filterQuality: FilterQuality.high,
-                        fit: BoxFit.contain,
-                        isAntiAlias: true,
-                      ),
-                      Text(
-                        'HISTORIQUE ET PRÉVISIONS MÉTÉO',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.logoColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                      buildAppBarContent(logoSpacing, flexibleText: true),
+                      CitySearchBar(
+                        onCitySelected: onCitySelected,
+                        maxBarHeight: maxHeightSearchBar,
+                        expandToAvailableWidth: true,
                       ),
                     ],
-                  ),
-                ),
-
-                CitySearchBar(onCitySelected: onCitySelected),
-              ],
+                  );
+                }
+                return Row(
+                  spacing: barSpacing,
+                  children: [
+                    buildAppBarContent(logoSpacing),
+                    Flexible(
+                      child: CitySearchBar(
+                        onCitySelected: onCitySelected,
+                        maxBarHeight: maxHeightSearchBar,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
