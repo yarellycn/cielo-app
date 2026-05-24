@@ -176,6 +176,7 @@ class _HomePageState extends State<HomePage> {
     bool isPhoneLayout,
   ) {
     return Column(
+      crossAxisAlignment: .start,
       spacing: 20,
       children: [
         SizedBox(
