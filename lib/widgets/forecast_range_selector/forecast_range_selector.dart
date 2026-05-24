@@ -54,6 +54,7 @@ class ForecastRangeSelector extends StatelessWidget {
     Widget buildRangePickerContainer() {
       return Row(
         mainAxisAlignment: shouldStackRangePicker ? .center : .start,
+        mainAxisSize: MainAxisSize.min,
         spacing: 8.00,
         children: [
           Icon(
@@ -71,31 +72,31 @@ class ForecastRangeSelector extends StatelessWidget {
       );
     }
 
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.zero,
-      color: const Color.fromARGB(255, 255, 255, 255),
-      child: DefaultTextStyle.merge(
-        style: Theme.of(
-          context,
-        ).textTheme.labelMedium?.copyWith(color: AppColors.forecastButtonText),
-        child: Padding(
-          padding: EdgeInsets.all(15.00),
-          child: shouldStackRangePicker
-              ? Column(
-                  spacing: 20.00,
-                  children: [
-                    buildRangeButtonsContainer(),
-                    buildRangePickerContainer(),
-                  ],
-                )
-              : Row(
-                  spacing: 20.00,
-                  children: [
-                    buildRangeButtonsContainer(),
-                    buildRangePickerContainer(),
-                  ],
-                ),
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        elevation: 2,
+        margin: EdgeInsets.zero,
+        color: const Color.fromARGB(255, 255, 255, 255),
+        child: DefaultTextStyle.merge(
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: AppColors.forecastButtonText,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(15.00),
+            child: Wrap(
+              spacing: 20,
+              runSpacing: 20,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: shouldStackRangePicker
+                  ? WrapAlignment.center
+                  : WrapAlignment.start,
+              children: [
+                buildRangeButtonsContainer(),
+                buildRangePickerContainer(),
+              ],
+            ),
+          ),
         ),
       ),
     );
