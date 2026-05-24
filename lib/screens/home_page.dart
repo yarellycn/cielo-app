@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildCurrentWeatherCard() {
+  Widget buildCurrentWeatherCard(bool isPhoneLayout) {
     return buildForecastSection(
       future: presetForecastDataFuture,
       // initialData: presetForecastData,
@@ -113,6 +113,7 @@ class _HomePageState extends State<HomePage> {
           selectedCity: selectedCity,
           currentWeatherData: forecastData.currentWeatherData,
           timeZoneAbbreviation: forecastData.timezoneAbbreviation,
+          shouldStackGrid: isPhoneLayout,
         );
       },
     );
@@ -203,15 +204,16 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final availableAppBarWidth =
         screenWidth.clamp(0.0, widgetWidth) - (homePadding * 2);
+    final phoneBreakpoint = 650;
 
-    final shouldStackSearchBar = availableAppBarWidth < 634;
+    final isPhoneLayout = availableAppBarWidth < phoneBreakpoint;
 
     return Scaffold(
       backgroundColor: AppColors.mainBackgroundColor,
       appBar: CieloAppBar(
         maxContentWidth: widgetWidth,
         padding: homePadding,
-        shouldStackSearchBar: shouldStackSearchBar,
+        shouldStackSearchBar: isPhoneLayout,
         onCitySelected: (city) {
           setState(() {
             selectedCity = city;
@@ -245,13 +247,16 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(homePadding),
                 children:
                     [
-                          buildCurrentWeatherCard(),
+                          buildCurrentWeatherCard(isPhoneLayout),
                           buildForecastRangeSelector(),
                           buildHourlyForecastCard(),
                           buildDailyWeatherList(widgetWidth - homePadding * 2),
                         ]
                         .expand(
-                          (widget) => [widget, const SizedBox(height: homePadding)],
+                          (widget) => [
+                            widget,
+                            const SizedBox(height: homePadding),
+                          ],
                         )
                         .toList(),
               ),

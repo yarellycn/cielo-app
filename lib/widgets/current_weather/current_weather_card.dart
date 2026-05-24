@@ -10,12 +10,14 @@ class CurrentWeatherCard extends StatefulWidget {
   final City? selectedCity;
   final CurrentWeather? currentWeatherData;
   final String? timeZoneAbbreviation;
+  final bool shouldStackGrid;
 
   const CurrentWeatherCard({
     super.key,
     this.selectedCity,
     this.currentWeatherData,
     this.timeZoneAbbreviation,
+    required this.shouldStackGrid,
   });
 
   @override
@@ -169,13 +171,12 @@ class CurrentWeatherCardState extends State<CurrentWeatherCard> {
             final availableWidth = constraints.maxWidth;
             final weatherColumnWidth = availableWidth * 0.50;
             final maxGridWidth = (tileWidth * 2) + tileSpacing;
-            final availableGridWidth = availableWidth - weatherColumnWidth;
             final gridWidth = maxGridWidth;
             final columnCount = 2;
             final rowCount = (5 / columnCount).ceil();
             final gridHeight =
                 (rowCount * tileHeight) + ((rowCount - 1) * tileSpacing);
-            final shouldStackGrid = availableGridWidth < maxGridWidth;
+            final shouldStackGrid = widget.shouldStackGrid;
 
             if (shouldStackGrid) {
               return Column(
