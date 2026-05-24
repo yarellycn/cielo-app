@@ -170,16 +170,22 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDailyWeatherList(double dailyWeatherListWidth) {
+  Widget buildDailyWeatherList(
+    double dailyWeatherListWidth,
+    bool isPhoneLayout,
+  ) {
     return Column(
-      crossAxisAlignment: .start,
       spacing: 20,
       children: [
-        Text(
-          'Prévisions journalières',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            'Prévisions journalières',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            textAlign: isPhoneLayout ? .center : .start,
+          ),
         ),
         buildForecastSection(
           future: forecastDataFuture,
@@ -251,7 +257,10 @@ class _HomePageState extends State<HomePage> {
                           buildCurrentWeatherCard(isPhoneLayout),
                           buildForecastRangeSelector(),
                           buildHourlyForecastCard(isPhoneLayout),
-                          buildDailyWeatherList(widgetWidth - homePadding * 2),
+                          buildDailyWeatherList(
+                            widgetWidth - homePadding * 2,
+                            isPhoneLayout,
+                          ),
                         ]
                         .expand(
                           (widget) => [

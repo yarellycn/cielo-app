@@ -71,19 +71,6 @@ class DailyForecastListState extends State<DailyForecastList> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Theme(
-      data: theme.copyWith(
-        textTheme: theme.textTheme.apply(
-          bodyColor: Colors.white,
-          displayColor: Colors.white,
-        ),
-      ),
-      child: DefaultTextStyle.merge(
-        style: theme.textTheme.bodyMedium!.copyWith(color: Colors.white),
-        child: buildDailyForecastWidget(context),
-      ),
-    );
+    return buildDailyForecastWidget(context);
   }
 }
