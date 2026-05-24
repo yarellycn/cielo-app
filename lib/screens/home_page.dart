@@ -249,30 +249,27 @@ class _HomePageState extends State<HomePage> {
               ? constraints.maxWidth
               : widgetWidth;
 
-          return Center(
-            child: SizedBox(
-              width: contentWidth,
-              child: ListView(
-                padding: const EdgeInsets.all(homePadding),
-                children:
-                    [
-                          buildCurrentWeatherCard(isPhoneLayout),
-                          buildForecastRangeSelector(isPhoneLayout),
-                          buildHourlyForecastCard(isPhoneLayout),
-                          buildDailyWeatherList(
-                            widgetWidth - homePadding * 2,
-                            isPhoneLayout,
-                          ),
-                        ]
-                        .expand(
-                          (widget) => [
-                            widget,
-                            const SizedBox(height: homePadding),
-                          ],
-                        )
-                        .toList(),
+          return ListView(
+            padding: const EdgeInsets.all(homePadding),
+            children: [
+              Center(
+                child: SizedBox(
+                  width: contentWidth - homePadding * 2,
+                  child: Column(
+                    spacing: homePadding,
+                    children: [
+                      buildCurrentWeatherCard(isPhoneLayout),
+                      buildForecastRangeSelector(isPhoneLayout),
+                      buildHourlyForecastCard(isPhoneLayout),
+                      buildDailyWeatherList(
+                        widgetWidth - homePadding * 2,
+                        isPhoneLayout,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         },
       ),
