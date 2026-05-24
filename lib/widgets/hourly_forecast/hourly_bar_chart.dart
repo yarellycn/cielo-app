@@ -1,14 +1,24 @@
 import 'dart:developer';
 
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:cielo_app/theme/app_colors.dart';
+import 'package:cielo_app/widgets/hourly_forecast/hourly_chart_helpers.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class HourlyBarChart extends StatefulWidget {
   final List<HourlyWeather>? hourlyWeatherData;
-  const HourlyBarChart({super.key, required this.hourlyWeatherData});
+  final ForecastRange selectedRange;
+  final DateTimeRange? selectedCustomRange;
+
+  const HourlyBarChart({
+    super.key,
+    required this.hourlyWeatherData,
+    required this.selectedRange,
+    required this.selectedCustomRange,
+  });
 
   @override
   State<HourlyBarChart> createState() => HourlyBarChartState();
@@ -17,32 +27,19 @@ class HourlyBarChart extends StatefulWidget {
 class HourlyBarChartState extends State<HourlyBarChart> {
   @override
   Widget build(BuildContext context) {
-    if (widget.hourlyWeatherData == null || widget.hourlyWeatherData!.isEmpty) {
-      return Center(child: Text('Hourly weather data is not available.'));
-    }
-
-    final todayHourlyData = getTodayHourlyData(widget.hourlyWeatherData!);
-
-    if (todayHourlyData.isEmpty) {
-      return const Center(child: Text('No hourly weather data available.'));
-    }
-
-    return BarChart(mainData(todayHourlyData));
+    return buildHourlyChart(
+      hourlyWeatherData: widget.hourlyWeatherData,
+      selectedRange: widget.selectedRange,
+      selectedCustomRange: widget.selectedCustomRange,
+      builder: (visibleHourlyData) => BarChart(mainData(visibleHourlyData)),
+    );
   }
 }
 
-List<HourlyWeather> getTodayHourlyData(List<HourlyWeather>? hourlyWeatherData) {
-  final today = DateUtils.dateOnly(DateTime.now());
-  return hourlyWeatherData!.where((hourlyData) {
-    final hourlyDate = DateUtils.dateOnly(hourlyData.time);
-    return hourlyDate == today;
-  }).toList();
-}
-
-List<BarChartGroupData> barValues(List<HourlyWeather> todayHourlyData) {
+List<BarChartGroupData> barValues(List<HourlyWeather> visibleHourlyData) {
   var showingTooltip = -1;
-  return List.generate(todayHourlyData.length, (index) {
-    final hourlyData = todayHourlyData[index];
+  return List.generate(visibleHourlyData.length, (index) {
+    final hourlyData = visibleHourlyData[index];
 
     return BarChartGroupData(
       x: index,
@@ -60,18 +57,18 @@ List<BarChartGroupData> barValues(List<HourlyWeather> todayHourlyData) {
 Widget bottomTitleWidgets(
   double value,
   TitleMeta meta,
-  List<HourlyWeather> todayHourlyData,
+  List<HourlyWeather> visibleHourlyData,
   double interval,
 ) {
   final index = value.toInt();
-  final isLastIndex = index == todayHourlyData.length - 1;
+  final isLastIndex = index == visibleHourlyData.length - 1;
   final isIntervalIndex = index % interval == 0;
 
   if (!isIntervalIndex && !isLastIndex) {
     return const SizedBox.shrink();
   }
 
-  final dateTime = todayHourlyData[index].time;
+  final dateTime = visibleHourlyData[index].time;
   final formattedDate = DateFormat('dd/MM').format(dateTime);
   final formattedTime = DateFormat('HH:mm').format(dateTime);
 
@@ -91,20 +88,8 @@ Widget bottomTitleWidgets(
   );
 }
 
-class AxisRange {
-  final double min;
-  final double max;
-  final double interval;
-
-  const AxisRange({
-    required this.min,
-    required this.max,
-    required this.interval,
-  });
-}
-
-AxisRange getAxisRange(List<HourlyWeather> todayHourlyData) {
-  final values = todayHourlyData.map((hourlyData) => hourlyData.precipitation);
+ChartYAxisRange getAxisRange(List<HourlyWeather> visibleHourlyData) {
+  final values = visibleHourlyData.map((hourlyData) => hourlyData.precipitation);
 
   final minValue = values.reduce((a, b) => a < b ? a : b);
   final maxValue = values.reduce((a, b) => a > b ? a : b);
@@ -122,7 +107,7 @@ AxisRange getAxisRange(List<HourlyWeather> todayHourlyData) {
 
   final chartInterval = maxValue > defaultMaxY ? 5 : defaultInterval;
 
-  return AxisRange(
+  return ChartYAxisRange(
     min: defaultMinY.toDouble(),
     max: chartMaxY.toDouble(),
     interval: chartInterval.toDouble(),
@@ -144,9 +129,9 @@ Widget leftTitleWidgets(double value, TitleMeta meta) {
   );
 }
 
-BarChartData mainData(List<HourlyWeather> todayHourlyData) {
+BarChartData mainData(List<HourlyWeather> visibleHourlyData) {
   final bottomTitlesInterval = 2.00;
-  final axisYRange = getAxisRange(todayHourlyData);
+  final axisYRange = getAxisRange(visibleHourlyData);
 
   return BarChartData(
     gridData: FlGridData(
@@ -161,8 +146,12 @@ BarChartData mainData(List<HourlyWeather> todayHourlyData) {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 35,
-          getTitlesWidget: (value, meta) =>
-              bottomTitleWidgets(value, meta, todayHourlyData, bottomTitlesInterval),
+          getTitlesWidget: (value, meta) => bottomTitleWidgets(
+            value,
+            meta,
+            visibleHourlyData,
+            bottomTitlesInterval,
+          ),
         ),
       ),
       leftTitles: AxisTitles(
@@ -180,6 +169,6 @@ BarChartData mainData(List<HourlyWeather> todayHourlyData) {
       show: true,
       border: Border.all(color: AppColors.forecastButtonText),
     ),
-    barGroups: barValues(todayHourlyData),
+    barGroups: barValues(visibleHourlyData),
   );
 }

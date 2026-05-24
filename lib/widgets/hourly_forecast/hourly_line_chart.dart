@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:cielo_app/enums/forecast_range.dart';
 import 'package:cielo_app/models/hourly_weather.dart';
 import 'package:cielo_app/enums/hourly_weather_metric.dart';
 import 'package:cielo_app/theme/app_colors.dart';
+import 'package:cielo_app/widgets/hourly_forecast/hourly_chart_helpers.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,11 +12,15 @@ import 'package:intl/intl.dart';
 class HourlyLineChart extends StatefulWidget {
   final List<HourlyWeather>? hourlyWeatherData;
   final HourlyWeatherMetric selectedMetric;
+  final ForecastRange selectedRange;
+  final DateTimeRange? selectedCustomRange;
 
   const HourlyLineChart({
     super.key,
     required this.hourlyWeatherData,
     required this.selectedMetric,
+    required this.selectedRange,
+    required this.selectedCustomRange,
   });
 
   @override
@@ -24,37 +30,21 @@ class HourlyLineChart extends StatefulWidget {
 class HourlyLineChartState extends State<HourlyLineChart> {
   @override
   Widget build(BuildContext context) {
-    if (widget.hourlyWeatherData == null || widget.hourlyWeatherData!.isEmpty) {
-      return Center(child: Text('Hourly weather data is not available.'));
-    }
-
-    final todayHourlyData = getTodayHourlyData(widget.hourlyWeatherData!);
-
-    if (todayHourlyData.isEmpty) {
-      return const Center(child: Text('No hourly weather data available.'));
-    }
-
-    return LineChart(mainData(todayHourlyData, widget.selectedMetric));
+    return buildHourlyChart(
+      hourlyWeatherData: widget.hourlyWeatherData,
+      selectedRange: widget.selectedRange,
+      selectedCustomRange: widget.selectedCustomRange,
+      builder: (visibleHourlyData) =>
+          LineChart(mainData(visibleHourlyData, widget.selectedMetric)),
+    );
   }
 }
 
-class AxisRange {
-  final double min;
-  final double max;
-  final double interval;
-
-  const AxisRange({
-    required this.min,
-    required this.max,
-    required this.interval,
-  });
-}
-
-AxisRange getAxisRange(
-  List<HourlyWeather> todayHourlyData,
+ChartYAxisRange getAxisRange(
+  List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
-  final values = todayHourlyData.map(
+  final values = visibleHourlyData.map(
     (hourlyData) => getHourlyMetricValue(hourlyData, selectedMetric),
   );
 
@@ -82,7 +72,7 @@ AxisRange getAxisRange(
       log('chartMinY: $chartMinY');
       log('chartMaxY: $chartMaxY');
 
-      return AxisRange(
+      return ChartYAxisRange(
         min: chartMinY.toDouble(),
         max: chartMaxY.toDouble(),
         interval: defaultInterval.toDouble(),
@@ -95,7 +85,7 @@ AxisRange getAxisRange(
       final chartMaxY = maxValue > defaultMaxY ? 100 : defaultMaxY;
       final chartInterval = maxValue > defaultMaxY ? 25 : defaultInterval;
 
-      return AxisRange(
+      return ChartYAxisRange(
         min: defaultMinY.toDouble(),
         max: chartMaxY.toDouble(),
         interval: chartInterval.toDouble(),
@@ -109,7 +99,7 @@ AxisRange getAxisRange(
           ? (maxValue / defaultInterval).ceil() * defaultInterval
           : defaultMaxY;
 
-      return AxisRange(
+      return ChartYAxisRange(
         min: defaultMinY.toDouble(),
         max: chartMaxY.toDouble(),
         interval: defaultInterval.toDouble(),
@@ -127,20 +117,12 @@ AxisRange getAxisRange(
 
       final chartInterval = maxValue > defaultMaxY ? 25 : defaultInterval;
 
-      return AxisRange(
+      return ChartYAxisRange(
         min: defaultMinY.toDouble(),
         max: chartMaxY.toDouble(),
         interval: chartInterval.toDouble(),
       );
   }
-}
-
-List<HourlyWeather> getTodayHourlyData(List<HourlyWeather>? hourlyWeatherData) {
-  final today = DateUtils.dateOnly(DateTime.now());
-  return hourlyWeatherData!.where((hourlyData) {
-    final hourlyDate = DateUtils.dateOnly(hourlyData.time);
-    return hourlyDate == today;
-  }).toList();
 }
 
 num getHourlyMetricValue(
@@ -217,14 +199,14 @@ MaterialColor getMetricColor(HourlyWeatherMetric selectedMetric) {
 Widget bottomTitleWidgets(
   double value,
   TitleMeta meta,
-  List<HourlyWeather> todayHourlyData,
+  List<HourlyWeather> visibleHourlyData,
 ) {
   final index = value.toInt();
-  if (index < 0 || index >= todayHourlyData.length) {
+  if (index < 0 || index >= visibleHourlyData.length) {
     return const SizedBox.shrink();
   }
 
-  final dateTime = todayHourlyData[index].time;
+  final dateTime = visibleHourlyData[index].time;
   final formattedDate = DateFormat('dd/MM').format(dateTime);
   final formattedTime = DateFormat('HH:mm').format(dateTime);
 
@@ -266,11 +248,11 @@ Widget leftTitleWidgets(
 }
 
 List<FlSpot> spots(
-  List<HourlyWeather> todayHourlyData,
+  List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
-  return List.generate(todayHourlyData.length, (index) {
-    final hourlyData = todayHourlyData[index];
+  return List.generate(visibleHourlyData.length, (index) {
+    final hourlyData = visibleHourlyData[index];
     final value = getHourlyMetricValue(hourlyData, selectedMetric);
 
     return FlSpot(index.toDouble(), value.toDouble());
@@ -279,15 +261,15 @@ List<FlSpot> spots(
 
 List<LineTooltipItem?> tooltipItems(
   List<LineBarSpot> touchedSpots,
-  List<HourlyWeather> todayHourlyData,
+  List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
   return touchedSpots.map((touchedSpot) {
     final index = touchedSpot.x.toInt();
-    if (index < 0 || index >= todayHourlyData.length) {
+    if (index < 0 || index >= visibleHourlyData.length) {
       return null;
     }
-    final hourlyData = todayHourlyData[index];
+    final hourlyData = visibleHourlyData[index];
     final dateTime = hourlyData.time;
     final formattedDate = DateFormat('EEEE d MMMM', 'fr').format(dateTime);
     final formattedTime = DateFormat('HH:mm', 'fr').format(dateTime);
@@ -303,13 +285,13 @@ List<LineTooltipItem?> tooltipItems(
 }
 
 LineChartData mainData(
-  List<HourlyWeather> todayHourlyData,
+  List<HourlyWeather> visibleHourlyData,
   HourlyWeatherMetric selectedMetric,
 ) {
   final bottomTitlesInterval = 3.00;
-  final hourCount = todayHourlyData.length;
+  final hourCount = visibleHourlyData.length;
   final metricColor = getMetricColor(selectedMetric);
-  final axisYRange = getAxisRange(todayHourlyData, selectedMetric);
+  final axisYRange = getAxisRange(visibleHourlyData, selectedMetric);
 
   return LineChartData(
     gridData: FlGridData(
@@ -327,7 +309,7 @@ LineChartData mainData(
           reservedSize: 35,
           interval: bottomTitlesInterval,
           getTitlesWidget: (value, meta) =>
-              bottomTitleWidgets(value, meta, todayHourlyData),
+              bottomTitleWidgets(value, meta, visibleHourlyData),
         ),
       ),
       leftTitles: AxisTitles(
@@ -350,7 +332,7 @@ LineChartData mainData(
     maxY: axisYRange.max,
     lineBarsData: [
       LineChartBarData(
-        spots: spots(todayHourlyData, selectedMetric),
+        spots: spots(visibleHourlyData, selectedMetric),
         isCurved: true,
         preventCurveOverShooting: true,
         dotData: const FlDotData(show: false),
@@ -378,7 +360,7 @@ LineChartData mainData(
         tooltipBorderRadius: BorderRadius.all(Radius.circular(12)),
         getTooltipColor: (_) => Colors.white,
         getTooltipItems: (touchedSpots) {
-          return tooltipItems(touchedSpots, todayHourlyData, selectedMetric);
+          return tooltipItems(touchedSpots, visibleHourlyData, selectedMetric);
         },
       ),
     ),

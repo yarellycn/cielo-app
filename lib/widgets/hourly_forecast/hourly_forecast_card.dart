@@ -132,10 +132,14 @@ class HourlyForecastCardState extends State<HourlyForecastCard> {
                 child: selectedMetric == HourlyWeatherMetric.precipitation
                     ? HourlyBarChart(
                         hourlyWeatherData: widget.hourlyWeatherData,
+                        selectedRange: widget.selectedRange,
+                        selectedCustomRange: widget.selectedCustomRange,
                       )
                     : HourlyLineChart(
                         hourlyWeatherData: widget.hourlyWeatherData,
                         selectedMetric: selectedMetric,
+                        selectedRange: widget.selectedRange,
+                        selectedCustomRange: widget.selectedCustomRange,
                       ),
               ),
             ),
